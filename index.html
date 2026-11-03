@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0A">
+<title>BLAZAR TEAM · Panel del profe</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230A0A0A'/%3E%3Cpath d='M18 3 7 18h7l-2 11 13-17h-7z' fill='%23F47B20'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:ital,wght@1,700;1,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A; --bg2:#0F0F0F; --card:#151515; --line:#2A2A2A; --tx:#F5F5F5; --mut:#9A9A9A;
+  --or:#F47B20; --ok:#4ADE80; --warn:#FACC15; --bad:#FF6B5E;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.35}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+svg{display:block}
+:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+
+/* ---------- Estructura ---------- */
+.shell{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18px 104px}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:calc(72px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--bg2);border-top:1px solid var(--line)}
+.nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-size:11px;font-weight:500;min-height:56px}
+.nav button.on{color:var(--or);font-weight:600}
+.brand,.side-foot{display:none}
+
+@media(min-width:900px){
+  .shell{flex-direction:row}
+  .nav{position:sticky;top:0;left:auto;right:auto;bottom:auto;height:100vh;height:100dvh;width:260px;flex:none;display:flex;flex-direction:column;gap:6px;padding:30px 16px 24px;border-top:none;border-right:1px solid var(--line)}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:14px;font-size:16px;padding:0 16px;min-height:50px;border-radius:12px;font-weight:500}
+  .nav button:hover{background:#1A1A1A;color:var(--tx)}
+  .nav button.on{background:rgba(244,123,32,.12);color:var(--or)}
+  .brand{display:block;margin:0 8px 28px}
+  .side-foot{display:block;margin:auto 8px 0;font-size:12px;color:var(--mut);line-height:1.5}
+  main{max-width:1200px;padding:40px 44px 56px}
+  .mlogo{display:none!important}
+}
+
+/* ---------- Tipografía ---------- */
+.wm{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;letter-spacing:3px;color:#E8E8E8}
+.logo{display:flex;align-items:center;gap:6px}
+.logo .wm{font-size:30px;line-height:1}
+.tag{font-size:10px;letter-spacing:4px;color:var(--mut);font-weight:500;margin-top:2px}
+.title{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;margin:0;line-height:1;text-transform:uppercase}
+.h1{font-size:38px}
+.h2{font-size:22px;letter-spacing:1px}
+.eyebrow{font-size:12px;letter-spacing:3px;color:var(--mut);text-transform:uppercase}
+.muted{color:var(--mut)}
+@media(min-width:900px){.h1{font-size:52px}.h2{font-size:26px}}
+
+/* ---------- Piezas ---------- */
+.vh{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.mlogo{margin-bottom:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.link{background:none;border:none;color:var(--or);font-weight:600;font-size:14px;padding:6px 0}
+.btn{min-height:48px;padding:0 20px;border-radius:12px;font-weight:600;font-size:15px;border:1px solid var(--line);background:var(--card);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--or);border-color:var(--or);color:#0A0A0A}
+.btn.ghost{background:transparent;border-color:var(--or);color:var(--or)}
+.btn.big{min-height:56px;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;font-size:24px;letter-spacing:2px;border-radius:14px;width:100%}
+.btn.sm{min-height:44px;padding:0 14px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:transparent;font-weight:600;font-size:14px}
+.chip.on{background:var(--or);border-color:var(--or);color:#0A0A0A}
+.av{width:42px;height:42px;flex:none;border-radius:50%;background:var(--line);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;white-space:nowrap}
+.badge i{width:8px;height:8px;border-radius:50%;display:block}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar b{display:block;height:100%;background:var(--or)}
+.big-num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;line-height:1}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut)}
+.input,.select{width:100%;min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 14px;color:var(--tx);font-size:15px}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239A9A9A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+.input::placeholder{color:#8A8A8A}
+
+/* ---------- Tablero ---------- */
+.g-home{display:grid;gap:16px}
+.rev-num{font-size:52px;margin:10px 0 14px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;border-top:3px solid var(--k,var(--line))}
+.kpi .big-num{font-size:34px}
+.kpi span{font-size:12px;color:var(--mut)}
+.line{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.line + .line{margin-top:8px}
+.line .grow{flex:1;min-width:0}
+.line b{display:block;font-size:15px;font-weight:600}
+.line small{display:block;font-size:12px;color:var(--mut)}
+@media(min-width:900px){
+  .g-home{grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
+  .c-rev{grid-column:span 7}.c-kpi{grid-column:span 5}.c-cob{grid-column:span 7}.c-act{grid-column:span 5}
+  .rev-num{font-size:68px}
+  .kpi{padding:18px}.kpi .big-num{font-size:48px}.kpi span{font-size:13px}
+}
+
+/* ---------- Alumnos ---------- */
+.tools{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.search{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.search input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--tx)}
+.search input::placeholder{color:#8A8A8A}
+.rows{display:flex;flex-direction:column;gap:8px}
+.rh{display:none}
+.row{width:100%;text-align:left;display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:62px}
+.row:hover{border-color:#3A3A3A}
+.row .nm b{display:block;font-weight:600;font-size:15px}
+.row .nm small{display:block;font-size:12px;color:var(--mut)}
+.row .c{display:none}
+.empty{padding:36px 0;text-align:center;color:var(--mut)}
+@media(min-width:900px){
+  .tools{flex-direction:row;align-items:center;justify-content:space-between}
+  .search{width:340px}
+  .rh,.row{grid-template-columns:42px minmax(0,1.6fr) 1.3fr 1fr 1fr 130px}
+  .rh{display:grid;gap:12px;padding:0 12px 8px;font-size:12px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+  .row .nm small{display:none}
+  .row .c{display:block;font-size:14px}
+}
+
+/* ---------- Cobrar ---------- */
+.g-two{display:grid;gap:18px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{min-height:64px;border-radius:12px;padding:10px 12px;text-align:left;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.opt b{font-size:14px;font-weight:600}.opt span{font-size:13px;color:#B5B5B5}
+.opt.on{background:var(--or);border-color:var(--or);color:#0A0A0A}.opt.on span{color:#0A0A0A}
+.meths{display:flex;gap:8px}
+.meth{flex:1;min-height:48px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13px}
+.meth.on{background:var(--or);border-color:var(--or);color:#0A0A0A}
+.sum{display:flex;flex-direction:column;gap:12px}
+.sum .r{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.sum .r span:first-child{color:var(--mut)}
+.sum .tot{display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px}
+.sum .tot .big-num{font-size:44px}
+.ok-ic{width:36px;height:36px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;flex:none}
+.rcpt{border-color:var(--or)}
+.rcpt .r{border-top:1px dashed var(--line);padding-top:10px}
+@media(min-width:900px){
+  .g-two{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:start}
+  .opts{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .sticky{position:sticky;top:36px}
+}
+
+/* ---------- Asistencia ---------- */
+.count{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.count .big-num{font-size:48px;color:var(--or)}.count .big-num small{font-size:26px;color:var(--mut)}
+.att{width:100%;text-align:left;display:flex;align-items:center;gap:12px;min-height:62px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.att.on{background:#1F1710;border-color:var(--or)}
+.att .grow{flex:1;min-width:0}.att b{display:block;font-weight:600;font-size:15px}.att small{display:block;font-size:12px;color:var(--mut)}
+.chk{width:32px;height:32px;border-radius:50%;border:2px solid #5A5A5A;display:flex;align-items:center;justify-content:center;flex:none}
+.att.on .chk{background:var(--or);border-color:var(--or)}
+.list2{display:grid;gap:8px}
+.alert{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px}
+.alert + .alert{margin-top:8px}
+@media(min-width:900px){
+  .list2{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .g-att{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:28px;align-items:start}
+}
+
+/* ---------- Avisos ---------- */
+.chat{background:var(--bg2);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:340px;display:flex;flex-direction:column}
+.chat-h{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--card);border-bottom:1px solid var(--line)}
+.chat-b{flex:1;padding:18px 14px;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.day{align-self:center;font-size:11px;letter-spacing:1px;color:var(--mut);background:#1A1A1A;border-radius:8px;padding:4px 10px}
+.bub{max-width:88%;background:#2A1A0C;border:1px solid #5A3515;border-radius:14px 14px 4px 14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.bub p{margin:0;font-size:15px;line-height:1.45;white-space:pre-line}
+.bub time{font-size:11px;color:#B5B5B5;align-self:flex-end}
+.steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.step{min-height:48px;border-radius:12px;padding:6px 10px;font-weight:600;font-size:13px;line-height:1.2;background:var(--card);border:1px solid var(--line)}
+.step.on{background:var(--or);border-color:var(--or);color:#0A0A0A}
+.note{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut)}
+@media(min-width:900px){
+  .steps{grid-template-columns:1fr}
+  .step{text-align:left;padding:0 16px;font-size:15px;min-height:54px}
+  .chat{min-height:420px}.bub{max-width:70%}
+}
+
+/* ---------- Diálogo ---------- */
+.dlg{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:18px;padding:22px;width:min(440px,92vw)}
+.dlg::backdrop{background:rgba(0,0,0,.72)}
+.dlg form{display:flex;flex-direction:column;gap:14px}
+.dlg .acts{display:flex;gap:10px;justify-content:flex-end}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="nav" aria-label="Secciones">
+  <div class="brand">
+    <div class="logo"><span class="wm">BLA</span><svg width="18" height="26" viewBox="0 0 18 26" fill="#F47B20" aria-hidden="true"><path d="M11 0 1 15h6l-2 11L17 9h-6z"/></svg><span class="wm">ZAR</span></div>
+    <div class="tag">TEAM CALISTENIA</div>
+  </div>
+  <button data-a="go" data-v="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Inicio</button>
+  <button data-a="go" data-v="alumnos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M16 4a4 4 0 0 1 0 8"/><path d="M18 14c2.5.8 4 3 4 7"/></svg>Alumnos</button>
+  <button data-a="go" data-v="pago"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/><path d="M6 16h4"/></svg>Cobrar</button>
+  <button data-a="go" data-v="asistencia"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg>Asistencia</button>
+  <button data-a="go" data-v="avisos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Avisos</button>
+  <div class="side-foot">Prototipo con datos de ejemplo.<br>Desarrollado por Vertag Solutions.</div>
+</nav>
+
+<main id="view"></main>
+</div>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlgT">
+  <form id="fNuevo">
+    <h2 class="title h2" id="dlgT">Nuevo alumno</h2>
+    <label class="field">Nombre y apellido<input class="input" name="nombre" required autocomplete="off"></label>
+    <label class="field">WhatsApp<input class="input" name="wa" inputmode="tel" placeholder="Ej: 5493764000000" autocomplete="off"></label>
+    <label class="field">Plan
+      <select class="select" name="plan">
+        <option value="2x">2 veces por semana · $ 22.000</option>
+        <option value="3x">3 veces por semana · $ 28.000</option>
+        <option value="libre" selected>Plan libre · $ 32.000</option>
+        <option value="trim">Trimestral libre · $ 84.000</option>
+      </select>
+    </label>
+    <div class="acts">
+      <button type="button" class="btn" data-a="cerrar">Cancelar</button>
+      <button type="submit" class="btn primary">Agregar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+'use strict';
+
+/* ===== Datos de ejemplo (después se reemplazan por la base de datos) ===== */
+var PLANES={
+  '2x':{n:'2 veces por semana',p:22000,d:30},
+  '3x':{n:'3 veces por semana',p:28000,d:30},
+  libre:{n:'Plan libre',p:32000,d:30},
+  trim:{n:'Trimestral libre',p:84000,d:90}
+};
+var METODOS={efvo:'Efectivo',transf:'Transferencia',mp:'Mercado Pago'};
+var DAY=864e5;
+var hoy=new Date(); hoy.setHours(0,0,0,0);
+
+function add(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function money(n){return '$ '+Math.round(n).toLocaleString('es-AR');}
+function dm(d){return d.getDate()+'/'+(d.getMonth()+1);}
+function dmy(d){return dm(d)+'/'+d.getFullYear();}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function longDate(d){return cap(d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}));}
+function ini(n){return n.split(' ').filter(Boolean).map(function(p){return p[0];}).slice(0,2).join('').toUpperCase();}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function pad(n){return String(n).padStart(4,'0');}
+
+var alumnos=[
+  {id:0,nombre:'Lucas Benítez',plan:'3x',off:0},
+  {id:1,nombre:'Camila Duarte',plan:'libre',off:-4},
+  {id:2,nombre:'Mateo Rojas',plan:'2x',off:0},
+  {id:3,nombre:'Sofía Almada',plan:'3x',off:15},
+  {id:4,nombre:'Tomás Giménez',plan:'libre',off:18},
+  {id:5,nombre:'Valentina Ríos',plan:'2x',off:3},
+  {id:6,nombre:'Joaquín Paredes',plan:'3x',off:-9},
+  {id:7,nombre:'Agustina Silva',plan:'libre',off:22},
+  {id:8,nombre:'Franco Villalba',plan:'2x',off:2},
+  {id:9,nombre:'Martina Acosta',plan:'3x',off:27},
+  {id:10,nombre:'Bruno Cabrera',plan:'2x',off:-2},
+  {id:11,nombre:'Lucía Fernández',plan:'libre',off:9}
+].map(function(a){a.vence=add(hoy,a.off);return a;});
+var nextId=12;
+
+var pagos=[];
+alumnos.forEach(function(a,i){
+  if(a.off>5){pagos.push({id:a.id,monto:PLANES[a.plan].p,metodo:i%2?'transf':'efvo',fecha:add(a.vence,-30),recibo:140+pagos.length,plan:a.plan,vence:a.vence});}
+});
+
+var ASIS=[3,4,0,7,9,11,10,5];
+
+var S={view:'home',filtro:'todos',q:'',pagoId:null,plan:null,metodo:'transf',pagado:null,
+  pres:new Set([3,4,7,9]),paso:'antes',avisoId:1,recibo:150};
+
+var TITLES={home:'Tablero',alumnos:'Alumnos',pago:'Cobrar',asistencia:'Asistencia',avisos:'Avisos automáticos'};
+
+/* ===== Helpers de dominio ===== */
+function byId(id){return alumnos.filter(function(a){return a.id===id;})[0];}
+function diff(a){return Math.round((a.vence-hoy)/DAY);}
+function estado(a){var d=diff(a);return d<0?'venc':d<=5?'por':'ok';}
+var EST={ok:{t:'Al día',c:'#4ADE80'},por:{t:'Por vencer',c:'#FACC15'},venc:{t:'Vencido',c:'#FF6B5E'}};
+function venceTxt(a){var d=diff(a);
+  if(d<0)return 'venció hace '+(-d)+(d===-1?' día':' días');
+  if(d===0)return 'vence hoy';
+  if(d===1)return 'vence mañana';
+  return 'vence el '+dm(a.vence);}
+function badge(a){var e=EST[estado(a)];return '<span class="badge" style="color:'+e.c+'"><i style="background:'+e.c+'"></i>'+e.t+'</span>';}
+
+/* ===== Íconos y logo ===== */
+var BOLT='<svg width="18" height="26" viewBox="0 0 18 26" fill="#F47B20" aria-hidden="true"><path d="M11 0 1 15h6l-2 11L17 9h-6z"/></svg>';
+var CHECK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+function mlogo(){return '<div class="mlogo"><div class="logo"><span class="wm">BLA</span>'+BOLT+'<span class="wm">ZAR</span></div><div class="tag">TEAM CALISTENIA</div></div>';}
+function head(eyebrow,title,right){return '<header class="vh"><div><div class="eyebrow">'+eyebrow+'</div><h1 class="title h1">'+title+'</h1></div>'+(right||'')+'</header>';}
+
+/* ===== Vistas ===== */
+function home(){
+  var cobrado=pagos.reduce(function(s,p){return s+p.monto;},0);
+  var pend=alumnos.filter(function(a){return estado(a)!=='ok';}).reduce(function(s,a){return s+PLANES[a.plan].p;},0);
+  var esperado=cobrado+pend, pct=esperado?Math.round(cobrado/esperado*100):0;
+  var n={ok:0,por:0,venc:0};alumnos.forEach(function(a){n[estado(a)]++;});
+  var cob=alumnos.filter(function(a){return estado(a)!=='ok'&&diff(a)<=0;}).sort(function(a,b){return diff(a)-diff(b);}).slice(0,4);
+  var act=pagos.slice().reverse().slice(0,4);
+  var hf=longDate(hoy).toUpperCase();
+
+  var listaCob=cob.length?cob.map(function(a){
+    return '<div class="line"><div class="av">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+PLANES[a.plan].n+' · '+venceTxt(a)+' · '+money(PLANES[a.plan].p)+'</small></div>'+
+    '<button class="btn ghost sm" data-a="recordar" data-id="'+a.id+'">Recordar</button></div>';}).join('')
+    :'<div class="empty">No hay cuotas para cobrar hoy.</div>';
+
+  var listaAct=act.map(function(p){var a=byId(p.id);
+    return '<div class="line"><div class="av">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+METODOS[p.metodo]+' · Recibo N° '+pad(p.recibo)+'</small></div><b style="font-size:14px">'+money(p.monto)+'</b></div>';}).join('');
+
+  return mlogo()+head(hf,'Hola, profe')+
+  '<div class="g-home">'+
+    '<section class="card c-rev"><div class="eyebrow">Cobrado este mes</div><div class="big-num rev-num">'+money(cobrado)+'</div>'+
+      '<div class="bar" role="img" aria-label="'+pct+'% cobrado"><b style="width:'+pct+'%"></b></div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px;color:var(--mut)"><span>'+pct+'% de lo esperado</span><span>Pendiente <b style="color:var(--tx);font-weight:600">'+money(pend)+'</b></span></div></section>'+
+    '<section class="kpis c-kpi" aria-label="Resumen">'+
+      '<div class="kpi" style="--k:#4ADE80"><div class="big-num">'+alumnos.length+'</div><span>Alumnos activos</span></div>'+
+      '<div class="kpi" style="--k:#FACC15"><div class="big-num">'+n.por+'</div><span>Vencen esta semana</span></div>'+
+      '<div class="kpi" style="--k:#FF6B5E"><div class="big-num">'+n.venc+'</div><span>Con cuota vencida</span></div></section>'+
+    '<section class="c-cob"><div class="sec"><h2 class="title h2">Para cobrar hoy</h2><button class="link" data-a="go" data-v="alumnos">Ver todos</button></div>'+listaCob+'</section>'+
+    '<section class="c-act"><div class="sec"><h2 class="title h2">Últimos pagos</h2></div>'+listaAct+'</section>'+
+  '</div>';
+}
+
+function alumnosView(){
+  var chips=[['todos','Todos'],['ok','Al día'],['por','Por vencer'],['venc','Vencidos']].map(function(c){
+    var cnt=alumnos.filter(function(a){return c[0]==='todos'||estado(a)===c[0];}).length;
+    return '<button class="chip'+(S.filtro===c[0]?' on':'')+'" data-a="filtro" data-k="'+c[0]+'">'+c[1]+' · '+cnt+'</button>';}).join('');
+  var add='<button class="btn primary" data-a="nuevo" aria-label="Agregar alumno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Agregar alumno</span></button>';
+  return mlogo()+head('BLAZAR TEAM','Alumnos',add)+
+  '<div class="tools"><label class="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A9A9A" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="text" aria-label="Buscar alumno" placeholder="Buscar por nombre" value="'+esc(S.q)+'" autocomplete="off"></label><div class="chips">'+chips+'</div></div>'+
+  '<div class="rh" aria-hidden="true"><span></span><span>Alumno</span><span>Plan</span><span>Vencimiento</span><span>Monto</span><span>Estado</span></div>'+
+  '<div class="rows" id="lista">'+listaAlumnos()+'</div>';
+}
+function listaAlumnos(){
+  var q=S.q.trim().toLowerCase();
+  var l=alumnos.filter(function(a){return (S.filtro==='todos'||estado(a)===S.filtro)&&(!q||a.nombre.toLowerCase().indexOf(q)>-1);});
+  if(!l.length)return '<div class="empty">No hay alumnos con ese filtro.</div>';
+  return l.map(function(a){var p=PLANES[a.plan];
+    return '<button class="row" data-a="cobrar" data-id="'+a.id+'"><span class="av">'+ini(a.nombre)+'</span>'+
+    '<span class="nm"><b>'+esc(a.nombre)+'</b><small>'+p.n+' · '+venceTxt(a)+'</small></span>'+
+    '<span class="c">'+p.n+'</span><span class="c">'+venceTxt(a)+'</span><span class="c">'+money(p.p)+'</span>'+badge(a)+'</button>';}).join('');
+}
+
+function setPago(id){S.pagoId=id;S.plan=byId(id).plan;S.pagado=null;}
+function pagoView(){
+  if(S.pagoId===null){var d=alumnos.filter(function(a){return estado(a)==='venc';})[0]||alumnos[0];setPago(d.id);}
+  var a=byId(S.pagoId), pl=PLANES[S.plan];
+  if(S.pagado){var p=S.pagado;
+    return mlogo()+head('Cobros','Pago registrado')+
+    '<div class="g-two"><div class="stack">'+
+      '<section class="card rcpt sum"><div style="display:flex;align-items:center;gap:10px"><div class="ok-ic">'+CHECK+'</div><h2 class="title h2" style="font-size:26px">Recibo N° '+pad(p.recibo)+'</h2></div>'+
+      '<div class="r"><span>Alumno</span><span>'+esc(a.nombre)+'</span></div>'+
+      '<div class="r"><span>Plan</span><span>'+PLANES[p.plan].n+'</span></div>'+
+      '<div class="r"><span>Método</span><span>'+METODOS[p.metodo]+'</span></div>'+
+      '<div class="r"><span>Fecha</span><span>'+dmy(p.fecha)+'</span></div>'+
+      '<div class="r"><span>Monto</span><b>'+money(p.monto)+'</b></div>'+
+      '<div class="r"><span>Próximo vencimiento</span><span>'+dmy(p.vence)+'</span></div></section>'+
+      '<button class="btn primary big" data-a="recibo" style="font-family:Barlow,sans-serif;font-style:normal;font-size:16px;letter-spacing:0;min-height:52px">Enviar recibo por WhatsApp</button>'+
+      '<button class="btn" data-a="go" data-v="home" style="min-height:52px">Volver al tablero</button>'+
+    '</div></div>';
+  }
+  var opts=Object.keys(PLANES).map(function(k){return '<button class="opt'+(S.plan===k?' on':'')+'" data-a="plan" data-k="'+k+'"><b>'+PLANES[k].n+'</b><span>'+money(PLANES[k].p)+'</span></button>';}).join('');
+  var meths=Object.keys(METODOS).map(function(k){return '<button class="meth'+(S.metodo===k?' on':'')+'" data-a="metodo" data-k="'+k+'">'+METODOS[k]+'</button>';}).join('');
+  var sel=alumnos.map(function(x){return '<option value="'+x.id+'"'+(x.id===a.id?' selected':'')+'>'+esc(x.nombre)+'</option>';}).join('');
+  var base=a.vence>hoy?a.vence:hoy, nuevo=add(base,pl.d);
+  return mlogo()+head('Cobros','Registrar pago')+
+  '<div class="g-two"><div class="stack">'+
+    '<label class="field">Alumno<select class="select" id="selPago">'+sel+'</select></label>'+
+    '<div class="card line" style="margin:0"><div class="av" style="width:48px;height:48px">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+PLANES[a.plan].n+' · '+venceTxt(a)+'</small></div>'+badge(a)+'</div>'+
+    '<div><div class="eyebrow" style="margin-bottom:10px">Plan a cobrar</div><div class="opts">'+opts+'</div></div>'+
+    '<div><div class="eyebrow" style="margin-bottom:10px">Método de pago</div><div class="meths">'+meths+'</div></div>'+
+  '</div>'+
+  '<aside class="card sum sticky"><div class="eyebrow">Resumen</div>'+
+    '<div class="r"><span>Alumno</span><span>'+esc(a.nombre)+'</span></div>'+
+    '<div class="r"><span>Plan</span><span>'+pl.n+'</span></div>'+
+    '<div class="r"><span>Método</span><span>'+METODOS[S.metodo]+'</span></div>'+
+    '<div class="r"><span>Nuevo vencimiento</span><span>'+dmy(nuevo)+'</span></div>'+
+    '<div class="tot"><span class="muted">Total</span><div class="big-num">'+money(pl.p)+'</div></div>'+
+    '<button class="btn primary big" data-a="registrar">REGISTRAR PAGO</button></aside>'+
+  '</div>';
+}
+
+function asistenciaView(){
+  var pres=ASIS.filter(function(id){return S.pres.has(id);}).length, tot=ASIS.length;
+  var l=ASIS.map(function(id){var a=byId(id), on=S.pres.has(id);
+    return '<button class="att'+(on?' on':'')+'" data-a="toggle" data-id="'+id+'" aria-pressed="'+on+'"><span class="av">'+ini(a.nombre)+'</span>'+
+    '<span class="grow"><b>'+esc(a.nombre)+'</b><small>'+PLANES[a.plan].n+' · '+venceTxt(a)+'</small></span><span class="chk">'+(on?CHECK:'')+'</span></button>';}).join('');
+  var ausentes=[6,10].map(function(id){var a=byId(id);
+    return '<div class="alert"><div class="grow" style="flex:1"><b style="font-size:14px;font-weight:600">'+esc(a.nombre)+'</b><small style="display:block;font-size:12px;color:var(--mut)">No viene hace 2 semanas · '+venceTxt(a)+'</small></div><button class="btn ghost sm" data-a="recordar" data-id="'+id+'">Escribirle</button></div>';}).join('');
+  return mlogo()+head(longDate(hoy).toUpperCase()+' · 19:00','Asistencia')+
+  '<div class="g-att"><div><div class="card count"><div class="big-num">'+pres+'<small>/'+tot+'</small></div><div style="flex:1"><div class="muted" style="font-size:13px;margin-bottom:8px">presentes en la clase de hoy</div><div class="bar"><b style="width:'+Math.round(pres/tot*100)+'%"></b></div></div></div>'+
+  '<div class="list2">'+l+'</div></div>'+
+  '<aside><div class="sec" style="margin-top:20px"><h2 class="title h2">Dejaron de venir</h2></div>'+ausentes+'</aside></div>';
+}
+
+function mensaje(a,paso){
+  var n=a.nombre.split(' ')[0], pl=PLANES[a.plan], m=money(pl.p);
+  if(paso==='antes')return {cuando:longDate(add(a.vence,-3)),hora:'10:00',txt:'Hola '+n+'! Te recordamos que tu cuota de BLAZAR TEAM ('+pl.n+', '+m+') vence el '+dm(a.vence)+'.\nPodés abonar en efectivo, por transferencia o Mercado Pago.\nNos vemos en el entrenamiento.'};
+  if(paso==='dia')return {cuando:longDate(a.vence),hora:'09:00',txt:'Hola '+n+', hoy vence tu cuota de BLAZAR TEAM ('+pl.n+', '+m+').\nSi ya pagaste, avisanos y lo registramos. Gracias!'};
+  if(paso==='atraso')return {cuando:longDate(add(a.vence,5)),hora:'10:00',txt:'Hola '+n+', vemos que tu cuota venció hace 5 días.\nSi querés te pasamos los datos para abonar, o si tuviste algún inconveniente, escribinos y lo charlamos.'};
+  var pg=pagos.slice().reverse().filter(function(p){return p.id===a.id;})[0];
+  var rn=pg?pg.recibo:S.recibo, prox=pg?pg.vence:add(hoy,pl.d), pm=pg?PLANES[pg.plan]:pl;
+  return {cuando:longDate(pg?pg.fecha:hoy),hora:'18:42',txt:'Recibimos tu pago, '+n+'. Gracias!\nRecibo N° '+pad(rn)+' · '+pm.n+' · '+money(pg?pg.monto:pl.p)+'\nTu próximo vencimiento es el '+dmy(prox)+'.\nA seguir entrenando.'};
+}
+function avisosView(){
+  var a=byId(S.avisoId), msg=mensaje(a,S.paso);
+  var pasos=[['antes','3 días antes del vencimiento'],['dia','Día del vencimiento'],['atraso','5 días de atraso'],['recibo','Recibo al pagar']].map(function(p){
+    return '<button class="step'+(S.paso===p[0]?' on':'')+'" data-a="paso" data-k="'+p[0]+'">'+p[1]+'</button>';}).join('');
+  var sel=alumnos.map(function(x){return '<option value="'+x.id+'"'+(x.id===a.id?' selected':'')+'>'+esc(x.nombre)+'</option>';}).join('');
+  return mlogo()+head('Lo que recibe el alumno por WhatsApp','Avisos automáticos')+
+  '<div class="g-two"><div class="stack">'+
+    '<label class="field">Ver ejemplo para<select class="select" id="selAviso">'+sel+'</select></label>'+
+    '<div class="steps">'+pasos+'</div>'+
+    '<div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F47B20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Se envía solo, sin que el profe tenga que acordarse.</span></div>'+
+  '</div>'+
+  '<section class="chat" aria-label="Vista previa del mensaje"><div class="chat-h"><div class="av" style="width:36px;height:36px;font-size:13px">'+ini(a.nombre)+'</div><div><b style="display:block;font-size:15px;font-weight:600">'+esc(a.nombre)+'</b><small class="muted" style="font-size:12px">WhatsApp · enviado por BLAZAR TEAM</small></div></div>'+
+  '<div class="chat-b"><div class="day">'+msg.cuando+'</div><div class="bub"><p>'+esc(msg.txt)+'</p><time>'+msg.hora+'</time></div></div></section></div>';
+}
+
+/* ===== Render y navegación ===== */
+var $v=document.getElementById('view');
+var VIEWS={home:home,alumnos:alumnosView,pago:pagoView,asistencia:asistenciaView,avisos:avisosView};
+function render(){
+  $v.innerHTML=VIEWS[S.view]();
+  var bs=document.querySelectorAll('.nav [data-v]');
+  for(var i=0;i<bs.length;i++){var on=bs[i].getAttribute('data-v')===S.view;bs[i].classList.toggle('on',on);if(on)bs[i].setAttribute('aria-current','page');else bs[i].removeAttribute('aria-current');}
+  document.title='BLAZAR TEAM · '+TITLES[S.view];
+}
+function fromHash(){var v=(location.hash||'').replace('#/','');return VIEWS[v]?v:'home';}
+function go(v){
+  if(location.hash==='#/'+v){S.view=v;if(v!=='pago')S.pagado=null;render();window.scrollTo(0,0);}
+  else location.hash='#/'+v;
+}
+window.addEventListener('hashchange',function(){S.view=fromHash();if(S.view!=='pago')S.pagado=null;render();window.scrollTo(0,0);});
+
+/* ===== Eventos ===== */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-a]');if(!t)return;
+  var a=t.getAttribute('data-a'), id=t.hasAttribute('data-id')?+t.getAttribute('data-id'):null, k=t.getAttribute('data-k');
+  if(a==='go'){go(t.getAttribute('data-v'));}
+  else if(a==='cobrar'){setPago(id);go('pago');}
+  else if(a==='recordar'){var al=byId(id),d=diff(al);S.avisoId=id;S.paso=d<0?'atraso':d===0?'dia':'antes';go('avisos');}
+  else if(a==='filtro'){S.filtro=k;render();}
+  else if(a==='plan'){S.plan=k;render();}
+  else if(a==='metodo'){S.metodo=k;render();}
+  else if(a==='registrar'){
+    var s=byId(S.pagoId),pl=PLANES[S.plan],base=s.vence>hoy?s.vence:hoy;
+    var p={id:s.id,monto:pl.p,metodo:S.metodo,fecha:hoy,recibo:S.recibo++,plan:S.plan,vence:add(base,pl.d)};
+    s.plan=S.plan;s.vence=p.vence;pagos.push(p);S.pagado=p;render();window.scrollTo(0,0);
+  }
+  else if(a==='recibo'){S.avisoId=S.pagado.id;S.paso='recibo';go('avisos');}
+  else if(a==='toggle'){if(S.pres.has(id))S.pres.delete(id);else S.pres.add(id);render();}
+  else if(a==='paso'){S.paso=k;render();}
+  else if(a==='nuevo'){document.getElementById('dlg').showModal();}
+  else if(a==='cerrar'){document.getElementById('dlg').close();}
+});
+document.addEventListener('input',function(e){
+  if(e.target.id==='q'){S.q=e.target.value;document.getElementById('lista').innerHTML=listaAlumnos();}
+});
+document.addEventListener('change',function(e){
+  if(e.target.id==='selPago'){setPago(+e.target.value);render();}
+  else if(e.target.id==='selAviso'){S.avisoId=+e.target.value;render();}
+});
+document.getElementById('fNuevo').addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=e.target, nombre=f.nombre.value.trim();if(!nombre)return;
+  alumnos.push({id:nextId++,nombre:nombre,wa:f.wa.value.trim(),plan:f.plan.value,off:30,vence:add(hoy,30)});
+  f.reset();document.getElementById('dlg').close();
+  S.filtro='todos';S.q='';if(S.view!=='alumnos'){go('alumnos');}else{render();}
+});
+
+S.view=fromHash();
+render();
+})();
+</script>
+</body>
+</html>
