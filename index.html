@@ -26,7 +26,7 @@ svg{display:block}
 /* ---------- Estructura ---------- */
 .shell{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
 main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18px 104px}
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:calc(72px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:var(--bg2);border-top:1px solid var(--line)}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:calc(72px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--bg2);border-top:1px solid var(--line)}
 .nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-size:11px;font-weight:500;min-height:56px}
 .nav button.on{color:var(--or);font-weight:600}
 .brand,.side-foot{display:none}
@@ -180,7 +180,7 @@ main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18
 }
 
 /* ---------- Diálogo ---------- */
-.dlg{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:18px;padding:22px;width:min(440px,92vw)}
+.dlg{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:18px;padding:22px;width:min(460px,92vw);max-height:92vh;max-height:92dvh;overflow:auto}
 .dlg::backdrop{background:rgba(0,0,0,.72)}
 .dlg form{display:flex;flex-direction:column;gap:14px}
 .dlg .acts{display:flex;gap:10px;justify-content:flex-end}
@@ -188,7 +188,7 @@ main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18
 /* ---------- Login y avisos ---------- */
 .shell[hidden]{display:none}
 .login{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
-.login[hidden]{display:none}
+.login[hidden],.login form[hidden]{display:none}
 .login form{width:min(380px,100%);display:flex;flex-direction:column;gap:14px}
 .login .logo{justify-content:center}
 .login .tag{text-align:center;margin-bottom:14px}
@@ -197,18 +197,107 @@ main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .loading{padding:60px 0;text-align:center;color:var(--mut)}
 @media(min-width:900px){.toast{bottom:32px}}
+.login .msg{color:var(--ok);font-size:14px;line-height:1.4}
+.login .msg:empty,.login .err:empty{display:none}
+.login .ttl{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;font-size:28px;text-transform:uppercase;margin:0}
+.login .sub{color:var(--mut);font-size:14px;margin:-6px 0 0}
+.login .links{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* ---------- Planes, ficha y progreso ---------- */
+textarea.input{padding:12px 14px;resize:vertical;min-height:72px;line-height:1.35}
+.toast.ok{border-left-color:var(--ok)}
+.btn.danger{color:var(--bad);border-color:#4A2A27;background:transparent}
+.hint{border:1px dashed var(--or);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.hint b{flex:1;min-width:200px;font-weight:500}
+.plan{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.plan + .plan{margin-top:8px}
+.plan.arch{opacity:.6}
+.plan .grow{flex:1;min-width:150px}
+.plan .grow b{display:block;font-size:16px}
+.plan small,.avi small{display:block;font-size:12px;color:var(--mut)}
+.plan .pr{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;font-size:28px;line-height:1}
+.plan .a2{display:flex;gap:8px}
+.g-fi{display:grid;gap:22px}
+@media(min-width:900px){.g-fi{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:start}}
+.dat{display:flex;flex-direction:column}
+.dat .r{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dat .r:last-child{border-bottom:none}
+.dat .r span:first-child{color:var(--mut);flex:none}
+.dat .r span:last-child{text-align:right;min-width:0;overflow-wrap:anywhere}
+.dat a{color:var(--or)}
+.acts3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts3 .btn{width:100%}
+.avi{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.avi + .avi{margin-top:8px}
+.avi .ic{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center}
+.avi .ic.logro{background:rgba(244,123,32,.16);color:var(--or)}
+.avi .ic.marca{background:rgba(74,222,128,.13);color:var(--ok)}
+.avi .grow{flex:1;min-width:0}
+.avi .grow b{display:block;font-size:15px;overflow-wrap:anywhere}
+.avi .nt{font-size:13px;opacity:.85;margin-top:3px;overflow-wrap:anywhere}
+.avi .val{font-weight:600;font-size:15px;text-align:right;white-space:nowrap}
+.avi .val i{display:block;font-style:normal;font-size:12px;color:var(--ok);font-weight:500}
+.avi .val i.neg{color:var(--mut)}
+.avi .x{background:none;border:none;color:var(--mut);font-size:22px;min-width:32px;min-height:36px;padding:0}
+.lk{background:none;border:none;padding:0;color:var(--or);font-size:12px;font-weight:600;min-height:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg label{position:relative;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;cursor:pointer;color:var(--tx)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--or);border-color:var(--or);color:#0A0A0A}
+.seg label:has(input:focus-visible){outline:2px solid var(--or);outline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two[hidden]{display:none}
+.sub2{font-size:13px;color:var(--mut);margin:0}
 </style>
 </head>
 <body>
 <section class="login" id="login" hidden>
-  <form id="fLogin">
+  <div style="width:min(400px,100%);display:flex;flex-direction:column;gap:14px">
     <div class="logo"><span class="wm" style="font-size:44px">BLA</span><svg width="26" height="38" viewBox="0 0 18 26" fill="#F47B20" aria-hidden="true"><path d="M11 0 1 15h6l-2 11L17 9h-6z"/></svg><span class="wm" style="font-size:44px">ZAR</span></div>
     <div class="tag">TEAM CALISTENIA</div>
-    <label class="field">Email<input class="input" type="email" name="email" required autocomplete="username"></label>
-    <label class="field">Contraseña<input class="input" type="password" name="pass" required autocomplete="current-password"></label>
-    <div class="err" id="loginErr" role="alert"></div>
-    <button type="submit" class="btn primary big" id="loginBtn">ENTRAR</button>
-  </form>
+    <div class="msg" id="authMsg" role="status"></div>
+    <div class="err" id="authErr" role="alert"></div>
+
+    <form id="fLogin" data-m="login">
+      <label class="field">Email<input class="input" type="email" name="email" required autocomplete="username"></label>
+      <label class="field">Contraseña<input class="input" type="password" name="pass" required autocomplete="current-password"></label>
+      <button type="submit" class="btn primary big">ENTRAR</button>
+      <div class="links"><button type="button" class="link" data-a="mode" data-k="forgot">Olvidé mi contraseña</button><button type="button" class="link" data-a="mode" data-k="signup">Crear cuenta</button></div>
+    </form>
+
+    <form id="fSignup" data-m="signup" hidden>
+      <h1 class="ttl">Crear cuenta</h1>
+      <p class="sub">Te enviamos un correo para confirmar tu email.</p>
+      <label class="field">Email<input class="input" type="email" name="email" required autocomplete="username"></label>
+      <label class="field">Contraseña (mínimo 8 caracteres)<input class="input" type="password" name="pass" required minlength="8" autocomplete="new-password"></label>
+      <label class="field">Repetir contraseña<input class="input" type="password" name="pass2" required minlength="8" autocomplete="new-password"></label>
+      <button type="submit" class="btn primary big">CREAR CUENTA</button>
+      <div class="links"><button type="button" class="link" data-a="mode" data-k="login">Ya tengo cuenta</button></div>
+    </form>
+
+    <form id="fForgot" data-m="forgot" hidden>
+      <h1 class="ttl">Recuperar contraseña</h1>
+      <p class="sub">Escribí tu email y te mandamos un enlace para elegir una nueva.</p>
+      <label class="field">Email<input class="input" type="email" name="email" required autocomplete="username"></label>
+      <button type="submit" class="btn primary big">ENVIAR ENLACE</button>
+      <div class="links"><button type="button" class="link" data-a="mode" data-k="login">Volver</button></div>
+    </form>
+
+    <form id="fReset" data-m="reset" hidden>
+      <h1 class="ttl">Nueva contraseña</h1>
+      <label class="field">Nueva contraseña (mínimo 8 caracteres)<input class="input" type="password" name="pass" required minlength="8" autocomplete="new-password"></label>
+      <label class="field">Repetir contraseña<input class="input" type="password" name="pass2" required minlength="8" autocomplete="new-password"></label>
+      <button type="submit" class="btn primary big">GUARDAR Y ENTRAR</button>
+    </form>
+
+    <form id="fGym" data-m="gym" hidden>
+      <h1 class="ttl">Tu gimnasio</h1>
+      <p class="sub">Un último paso: ponele nombre a tu gimnasio. Los planes de cuota los creás después, en la sección Planes.</p>
+      <label class="field">Nombre del gimnasio<input class="input" name="nombre" required minlength="2" autocomplete="organization"></label>
+      <button type="submit" class="btn primary big">CREAR GIMNASIO</button>
+      <div class="links"><button type="button" class="link" data-a="salir">Cerrar sesión</button></div>
+    </form>
+  </div>
 </section>
 <div class="toast" id="toast" role="status"></div>
 <div class="shell" id="shell" hidden>
@@ -222,7 +311,8 @@ main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18
   <button data-a="go" data-v="alumnos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M16 4a4 4 0 0 1 0 8"/><path d="M18 14c2.5.8 4 3 4 7"/></svg>Alumnos</button>
   <button data-a="go" data-v="pago"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/><path d="M6 16h4"/></svg>Cobrar</button>
   <button data-a="go" data-v="asistencia"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg>Asistencia</button>
-  <button data-a="go" data-v="avisos"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Avisos</button>
+  <button data-a="go" data-v="progreso"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progreso</button>
+  <button data-a="go" data-v="planes"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>Planes</button>
   <div class="side-foot"><button class="link" data-a="salir" style="display:block;margin-bottom:10px">Cerrar sesión</button>Desarrollado por Vertag Solutions.</div>
 </nav>
 
@@ -233,14 +323,53 @@ main{flex:1;min-width:0;width:100%;max-width:640px;margin:0 auto;padding:24px 18
   <form id="fNuevo">
     <h2 class="title h2" id="dlgT">Nuevo alumno</h2>
     <label class="field">Nombre y apellido<input class="input" name="nombre" required autocomplete="off"></label>
-    <label class="field">WhatsApp<input class="input" name="wa" inputmode="tel" placeholder="Ej: 5493764000000" autocomplete="off"></label>
-    <label class="field">Plan
-      <select class="select" name="plan" id="selPlanNuevo"></select>
-    </label>
+    <label class="field">Teléfono (WhatsApp)<input class="input" name="wa" type="tel" inputmode="tel" required placeholder="Ej: 3764 123456" autocomplete="off"></label>
+    <label class="field">Dirección<input class="input" name="dir" required placeholder="Calle, número y barrio" autocomplete="off"></label>
+    <label class="field">Plan<select class="select" name="plan" required></select></label>
     <label class="field">Vencimiento de la cuota actual<input class="input" type="date" name="vence" required></label>
+    <label class="field">Notas (opcional)<textarea class="input" name="notas" rows="2" placeholder="Lesiones, objetivos, observaciones"></textarea></label>
     <div class="acts">
-      <button type="button" class="btn" data-a="cerrar">Cancelar</button>
-      <button type="submit" class="btn primary">Agregar</button>
+      <button type="button" class="btn" data-a="cerrar" data-k="dlg">Cancelar</button>
+      <button type="submit" class="btn primary" id="btnAl">Agregar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg" id="dlgPlan" aria-labelledby="dlgPlanT">
+  <form id="fPlan">
+    <h2 class="title h2" id="dlgPlanT">Nuevo plan</h2>
+    <label class="field">Nombre del plan<input class="input" name="nombre" required maxlength="60" placeholder="Ej: 3 veces por semana" autocomplete="off"></label>
+    <div class="two">
+      <label class="field">Precio ($)<input class="input" name="precio" type="number" min="0" step="any" inputmode="decimal" required></label>
+      <label class="field">Dura (meses)<input class="input" name="meses" type="number" min="1" max="24" step="1" inputmode="numeric" required value="1"></label>
+    </div>
+    <p class="sub2">Si cambiás el precio, solo vale para los cobros nuevos. Los pagos ya registrados no se modifican.</p>
+    <div class="acts">
+      <button type="button" class="btn" data-a="cerrar" data-k="dlgPlan">Cancelar</button>
+      <button type="submit" class="btn primary" id="btnPlan">Crear plan</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg" id="dlgAv" aria-labelledby="dlgAvT">
+  <form id="fAv">
+    <h2 class="title h2" id="dlgAvT">Registrar avance</h2>
+    <label class="field">Alumno<select class="select" name="alumno" required></select></label>
+    <div class="seg" role="radiogroup" aria-label="Tipo de avance">
+      <label><input type="radio" name="tipo" value="logro" checked>Logro (hito)</label>
+      <label><input type="radio" name="tipo" value="marca">Marca (medición)</label>
+    </div>
+    <label class="field">Ejercicio o habilidad<input class="input" name="ejercicio" list="ejlist" required maxlength="80" placeholder="Ej: Muscle-up, Dominadas" autocomplete="off"></label>
+    <datalist id="ejlist"></datalist>
+    <div class="two" id="mk" hidden>
+      <label class="field">Valor<input class="input" name="valor" type="number" min="0" step="any" inputmode="decimal"></label>
+      <label class="field">Unidad<select class="select" name="unidad"><option>reps</option><option>seg</option><option>kg</option><option>cm</option><option>m</option></select></label>
+    </div>
+    <label class="field">Fecha<input class="input" type="date" name="fecha" required></label>
+    <label class="field">Nota (opcional)<textarea class="input" name="nota" rows="2" placeholder="Cómo salió, qué falta mejorar"></textarea></label>
+    <div class="acts">
+      <button type="button" class="btn" data-a="cerrar" data-k="dlgAv">Cancelar</button>
+      <button type="submit" class="btn primary">Guardar</button>
     </div>
   </form>
 </dialog>
@@ -274,15 +403,22 @@ function ini(n){return n.split(' ').filter(Boolean).map(function(p){return p[0];
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function pad(n){return String(n).padStart(4,'0');}
 var toastT;
-function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},4000);}
+function toast(m,ok){var t=document.getElementById('toast');t.textContent=m;t.classList.toggle('ok',!!ok);t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('on');},4000);}
 function planOf(a){return PLANES[a.plan]||{n:'Sin plan',p:0,m:1};}
 
 var alumnos=[], pagos=[], ULT={};
+function rebuildOrd(){PLAN_ORD=Object.keys(PLANES).filter(function(k){return PLANES[k].act;}).sort(function(a,b){return PLANES[a].p-PLANES[b].p;});}
+function mapPlan(p){return {n:p.nombre,p:+p.precio,m:+p.meses,act:p.activo!==false};}
+function mapAl(x){return {id:x.id,nombre:x.nombre,wa:x.whatsapp||'',dir:x.direccion||'',notas:x.notas||'',plan:x.plan_id,vence:x.vence?pd(x.vence):hoy,alta:pd(x.fecha_alta)};}
+function durTxt(m){return m===1?'1 mes':m+' meses';}
+function fmtNum(n){return Number(n).toLocaleString('es-AR',{maximumFractionDigits:2});}
+function waNum(a){var d=String(a.wa||'').replace(/\D/g,'');if(d.length===10)d='549'+d;return d;}
 
-var S={view:'home',filtro:'todos',q:'',pagoId:null,plan:null,metodo:'transferencia',pagado:null,
+var S={fichaId:null,F:null,AV:null,avF:'todos',edit:null,editPlan:null,view:'home',filtro:'todos',q:'',pagoId:null,plan:null,metodo:'transferencia',pagado:null,
   pres:new Set(),paso:'antes',avisoId:null,recibo:1,busy:false,cargado:false};
 
-var TITLES={home:'Tablero',alumnos:'Alumnos',pago:'Cobrar',asistencia:'Asistencia',avisos:'Avisos (Fase 2)'};
+var TITLES={home:'Tablero',alumnos:'Alumnos',alumno:'Ficha del alumno',pago:'Cobrar',asistencia:'Asistencia',progreso:'Progreso',planes:'Planes',avisos:'Avisos (Fase 2)'};
+var DEF_EJ=['Dominadas','Fondos','Flexiones','Muscle-up','Handstand','Plancha','Front lever','Planche','L-sit','Sentadilla pistol'];
 
 /* ===== Helpers de dominio ===== */
 function byId(id){return alumnos.filter(function(a){return a.id===id;})[0];}
@@ -313,7 +449,7 @@ function home(){
   var hf=longDate(hoy).toUpperCase();
 
   var listaCob=cob.length?cob.map(function(a){
-    return '<div class="line"><div class="av">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+planOf(a).n+' · '+venceTxt(a)+' · '+money(planOf(a).p)+'</small></div>'+
+    return '<div class="line"><div class="av">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+esc(planOf(a).n)+' · '+venceTxt(a)+' · '+money(planOf(a).p)+'</small></div>'+
     '<button class="btn ghost sm" data-a="recordar" data-id="'+a.id+'">Recordar</button></div>';}).join('')
     :'<div class="empty">No hay cuotas para cobrar hoy.</div>';
 
@@ -321,6 +457,7 @@ function home(){
     return '<div class="line"><div class="av">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+METODOS[p.metodo]+' · Recibo N° '+pad(p.recibo)+'</small></div><b style="font-size:14px">'+money(p.monto)+'</b></div>';}).join('');
 
   return mlogo()+head(hf,'Hola, profe','<button class="btn ghost sm" data-a="salir">Salir</button>')+
+  (!PLAN_ORD.length?'<div class="hint"><b>Para empezar, creá tus planes de cuota (nombre, precio y duración).</b><button class="btn primary" data-a="go" data-v="planes">Crear planes</button></div>':'')+
   '<div class="g-home">'+
     '<section class="card c-rev"><div class="eyebrow">Cobrado este mes</div><div class="big-num rev-num">'+money(cobrado)+'</div>'+
       '<div class="bar" role="img" aria-label="'+pct+'% cobrado"><b style="width:'+pct+'%"></b></div>'+
@@ -339,24 +476,28 @@ function alumnosView(){
     var cnt=alumnos.filter(function(a){return c[0]==='todos'||estado(a)===c[0];}).length;
     return '<button class="chip'+(S.filtro===c[0]?' on':'')+'" data-a="filtro" data-k="'+c[0]+'">'+c[1]+' · '+cnt+'</button>';}).join('');
   var add='<button class="btn primary" data-a="nuevo" aria-label="Agregar alumno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Agregar alumno</span></button>';
-  return mlogo()+head('BLAZAR TEAM','Alumnos',add)+
-  '<div class="tools"><label class="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A9A9A" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="text" aria-label="Buscar alumno" placeholder="Buscar por nombre" value="'+esc(S.q)+'" autocomplete="off"></label><div class="chips">'+chips+'</div></div>'+
+  return mlogo()+head(esc(GYM.nombre),'Alumnos',add)+
+  '<div class="tools"><label class="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A9A9A" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="text" aria-label="Buscar alumno" placeholder="Buscar por nombre, teléfono o dirección" value="'+esc(S.q)+'" autocomplete="off"></label><div class="chips">'+chips+'</div></div>'+
   '<div class="rh" aria-hidden="true"><span></span><span>Alumno</span><span>Plan</span><span>Vencimiento</span><span>Monto</span><span>Estado</span></div>'+
   '<div class="rows" id="lista">'+listaAlumnos()+'</div>';
 }
 function listaAlumnos(){
-  var q=S.q.trim().toLowerCase();
-  var l=alumnos.filter(function(a){return (S.filtro==='todos'||estado(a)===S.filtro)&&(!q||a.nombre.toLowerCase().indexOf(q)>-1);});
-  if(!l.length)return '<div class="empty">No hay alumnos con ese filtro.</div>';
+  var q=S.q.trim().toLowerCase(), qd=q.replace(/\D/g,'');
+  var l=alumnos.filter(function(a){
+    if(S.filtro!=='todos'&&estado(a)!==S.filtro)return false;
+    if(!q)return true;
+    return a.nombre.toLowerCase().indexOf(q)>-1||a.dir.toLowerCase().indexOf(q)>-1||(qd&&a.wa.replace(/\D/g,'').indexOf(qd)>-1);
+  });
+  if(!l.length)return '<div class="empty">'+(alumnos.length?'No hay alumnos con ese filtro.':'Todavía no cargaste alumnos. Tocá "Agregar alumno" para empezar.')+'</div>';
   return l.map(function(a){var p=planOf(a);
-    return '<button class="row" data-a="cobrar" data-id="'+a.id+'"><span class="av">'+ini(a.nombre)+'</span>'+
-    '<span class="nm"><b>'+esc(a.nombre)+'</b><small>'+p.n+' · '+venceTxt(a)+'</small></span>'+
-    '<span class="c">'+p.n+'</span><span class="c">'+venceTxt(a)+'</span><span class="c">'+money(p.p)+'</span>'+badge(a)+'</button>';}).join('');
+    return '<button class="row" data-a="ficha" data-id="'+a.id+'"><span class="av">'+ini(a.nombre)+'</span>'+
+    '<span class="nm"><b>'+esc(a.nombre)+'</b><small>'+esc(p.n)+' · '+venceTxt(a)+'</small></span>'+
+    '<span class="c">'+esc(p.n)+'</span><span class="c">'+venceTxt(a)+'</span><span class="c">'+money(p.p)+'</span>'+badge(a)+'</button>';}).join('');
 }
 
 function setPago(id){S.pagoId=id;S.plan=byId(id).plan||PLAN_ORD[0];S.pagado=null;}
 function pagoView(){
-  if(!alumnos.length||!PLAN_ORD.length)return mlogo()+head('Cobros','Registrar pago')+'<div class="empty">'+(alumnos.length?'No hay planes cargados.':'Primero agregá alumnos.')+'</div>';
+  if(!alumnos.length||!PLAN_ORD.length)return mlogo()+head('Cobros','Registrar pago')+'<div class="empty">'+(PLAN_ORD.length?'Primero agregá alumnos.':'Primero creá tus planes en la sección Planes.')+'</div>';
   if(S.pagoId===null||!byId(S.pagoId)){var d=alumnos.filter(function(a){return estado(a)==='venc';})[0]||alumnos[0];setPago(d.id);}
   var a=byId(S.pagoId), pl=PLANES[S.plan]||planOf(a);
   if(S.pagado){var p=S.pagado;
@@ -373,20 +514,20 @@ function pagoView(){
       '<button class="btn" data-a="go" data-v="home" style="min-height:52px">Volver al tablero</button>'+
     '</div></div>';
   }
-  var opts=PLAN_ORD.map(function(k){return '<button class="opt'+(S.plan===k?' on':'')+'" data-a="plan" data-k="'+k+'"><b>'+PLANES[k].n+'</b><span>'+money(PLANES[k].p)+'</span></button>';}).join('');
+  var opts=PLAN_ORD.map(function(k){return '<button class="opt'+(S.plan===k?' on':'')+'" data-a="plan" data-k="'+k+'"><b>'+esc(PLANES[k].n)+'</b><span>'+money(PLANES[k].p)+'</span></button>';}).join('');
   var meths=Object.keys(METODOS).map(function(k){return '<button class="meth'+(S.metodo===k?' on':'')+'" data-a="metodo" data-k="'+k+'">'+METODOS[k]+'</button>';}).join('');
   var sel=alumnos.map(function(x){return '<option value="'+x.id+'"'+(x.id===a.id?' selected':'')+'>'+esc(x.nombre)+'</option>';}).join('');
   var base=a.vence>hoy?a.vence:hoy, nuevo=addM(base,pl.m);
   return mlogo()+head('Cobros','Registrar pago')+
   '<div class="g-two"><div class="stack">'+
     '<label class="field">Alumno<select class="select" id="selPago">'+sel+'</select></label>'+
-    '<div class="card line" style="margin:0"><div class="av" style="width:48px;height:48px">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+planOf(a).n+' · '+venceTxt(a)+'</small></div>'+badge(a)+'</div>'+
+    '<div class="card line" style="margin:0"><div class="av" style="width:48px;height:48px">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+esc(planOf(a).n)+' · '+venceTxt(a)+'</small></div>'+badge(a)+'</div>'+
     '<div><div class="eyebrow" style="margin-bottom:10px">Plan a cobrar</div><div class="opts">'+opts+'</div></div>'+
     '<div><div class="eyebrow" style="margin-bottom:10px">Método de pago</div><div class="meths">'+meths+'</div></div>'+
   '</div>'+
   '<aside class="card sum sticky"><div class="eyebrow">Resumen</div>'+
     '<div class="r"><span>Alumno</span><span>'+esc(a.nombre)+'</span></div>'+
-    '<div class="r"><span>Plan</span><span>'+pl.n+'</span></div>'+
+    '<div class="r"><span>Plan</span><span>'+esc(pl.n)+'</span></div>'+
     '<div class="r"><span>Método</span><span>'+METODOS[S.metodo]+'</span></div>'+
     '<div class="r"><span>Nuevo vencimiento</span><span>'+dmy(nuevo)+'</span></div>'+
     '<div class="tot"><span class="muted">Total</span><div class="big-num">'+money(pl.p)+'</div></div>'+
@@ -404,19 +545,19 @@ function asistenciaView(){
   var hayAsis=Object.keys(ULT).length>0;
   var faltan=hayAsis?alumnos.filter(function(a){return !ULT[a.id]&&(hoy-a.alta)/DAY>=14;}).slice(0,6):[];
   var ausentes=faltan.map(function(a){
-    return '<div class="alert"><div class="grow" style="flex:1"><b style="font-size:14px;font-weight:600">'+esc(a.nombre)+'</b><small style="display:block;font-size:12px;color:var(--mut)">No viene hace 2 semanas · '+venceTxt(a)+'</small></div>'+(a.wa?'<a class="btn ghost sm" target="_blank" rel="noopener" href="'+waUrl(a,'Hola '+a.nombre.split(' ')[0]+'! Hace un tiempo que no te vemos por BLAZAR TEAM. ¿Está todo bien? Te esperamos para entrenar.')+'">Escribirle</a>':'')+'</div>';}).join('')||'<div class="empty" style="padding:18px 0">'+(hayAsis?'Todos vinieron en las últimas 2 semanas.':'Se completa a medida que tomás asistencia.')+'</div>';
+    return '<div class="alert"><div class="grow" style="flex:1"><b style="font-size:14px;font-weight:600">'+esc(a.nombre)+'</b><small style="display:block;font-size:12px;color:var(--mut)">No viene hace 2 semanas · '+venceTxt(a)+'</small></div>'+(a.wa?'<a class="btn ghost sm" target="_blank" rel="noopener" href="'+waUrl(a,'Hola '+a.nombre.split(' ')[0]+'! Hace un tiempo que no te vemos por '+GYM.nombre+'. ¿Está todo bien? Te esperamos para entrenar.')+'">Escribirle</a>':'')+'</div>';}).join('')||'<div class="empty" style="padding:18px 0">'+(hayAsis?'Todos vinieron en las últimas 2 semanas.':'Se completa a medida que tomás asistencia.')+'</div>';
   return mlogo()+head(longDate(hoy).toUpperCase(),'Asistencia')+
   '<div class="g-att"><div><div class="card count"><div class="big-num">'+pres+'<small>/'+tot+'</small></div><div style="flex:1"><div class="muted" style="font-size:13px;margin-bottom:8px">presentes en la clase de hoy</div><div class="bar"><b style="width:'+(tot?Math.round(pres/tot*100):0)+'%"></b></div></div></div>'+
   '<div class="list2">'+l+'</div></div>'+
   '<aside><div class="sec" style="margin-top:20px"><h2 class="title h2">Dejaron de venir</h2></div>'+ausentes+'</aside></div>';
 }
 
-function waUrl(a,txt){return 'https://wa.me/'+String(a.wa||'').replace(/\D/g,'')+'?text='+encodeURIComponent(txt);}
+function waUrl(a,txt){return 'https://wa.me/'+waNum(a)+'?text='+encodeURIComponent(txt);}
 
 function mensaje(a,paso){
   var n=a.nombre.split(' ')[0], pl=planOf(a), m=money(pl.p);
-  if(paso==='antes')return {cuando:longDate(add(a.vence,-3)),hora:'10:00',txt:'Hola '+n+'! Te recordamos que tu cuota de BLAZAR TEAM ('+pl.n+', '+m+') vence el '+dm(a.vence)+'.\nPodés abonar en efectivo, por transferencia o Mercado Pago.\nNos vemos en el entrenamiento.'};
-  if(paso==='dia')return {cuando:longDate(a.vence),hora:'09:00',txt:'Hola '+n+', hoy vence tu cuota de BLAZAR TEAM ('+pl.n+', '+m+').\nSi ya pagaste, avisanos y lo registramos. Gracias!'};
+  if(paso==='antes')return {cuando:longDate(add(a.vence,-3)),hora:'10:00',txt:'Hola '+n+'! Te recordamos que tu cuota de '+GYM.nombre+' ('+pl.n+', '+m+') vence el '+dm(a.vence)+'.\nPodés abonar en efectivo, por transferencia o Mercado Pago.\nNos vemos en el entrenamiento.'};
+  if(paso==='dia')return {cuando:longDate(a.vence),hora:'09:00',txt:'Hola '+n+', hoy vence tu cuota de '+GYM.nombre+' ('+pl.n+', '+m+').\nSi ya pagaste, avisanos y lo registramos. Gracias!'};
   if(paso==='atraso')return {cuando:longDate(add(a.vence,5)),hora:'10:00',txt:'Hola '+n+', vemos que tu cuota venció hace 5 días.\nSi querés te pasamos los datos para abonar, o si tuviste algún inconveniente, escribinos y lo charlamos.'};
   var pg=pagos.slice().reverse().filter(function(p){return p.id===a.id;})[0];
   var rn=pg?pg.recibo:S.recibo, prox=pg?pg.vence:addM(hoy,pl.m), pm=pg?(PLANES[pg.plan]||pl):pl;
@@ -435,21 +576,98 @@ function avisosView(){
     '<div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F47B20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>En la Fase 2 se enviará solo, sin que el profe tenga que acordarse. Por ahora podés mandarlo a mano.</span></div>'+
     (a.wa?'<a class="btn primary" style="min-height:52px" target="_blank" rel="noopener" href="'+waUrl(a,msg.txt)+'">Abrir en WhatsApp</a>':'<div class="muted" style="font-size:13px">Este alumno no tiene WhatsApp cargado.</div>')+
   '</div>'+
-  '<section class="chat" aria-label="Vista previa del mensaje"><div class="chat-h"><div class="av" style="width:36px;height:36px;font-size:13px">'+ini(a.nombre)+'</div><div><b style="display:block;font-size:15px;font-weight:600">'+esc(a.nombre)+'</b><small class="muted" style="font-size:12px">WhatsApp · enviado por BLAZAR TEAM</small></div></div>'+
+  '<section class="chat" aria-label="Vista previa del mensaje"><div class="chat-h"><div class="av" style="width:36px;height:36px;font-size:13px">'+ini(a.nombre)+'</div><div><b style="display:block;font-size:15px;font-weight:600">'+esc(a.nombre)+'</b><small class="muted" style="font-size:12px">WhatsApp · enviado por '+esc(GYM.nombre)+'</small></div></div>'+
   '<div class="chat-b"><div class="day">'+msg.cuando+'</div><div class="bub"><p>'+esc(msg.txt)+'</p><time>'+msg.hora+'</time></div></div></section></div>';
+}
+
+function avItem(av,list,i,showName){
+  var al=byId(av.alumno_id), val, dl='';
+  if(av.tipo==='marca'){
+    val=fmtNum(av.valor)+' '+esc(av.unidad||'');
+    for(var j=i+1;j<list.length;j++){var q=list[j];
+      if(q.alumno_id===av.alumno_id&&q.tipo==='marca'&&q.ejercicio.toLowerCase()===av.ejercicio.toLowerCase()){
+        var d=av.valor-q.valor;dl='<i class="'+(d<0?'neg':'')+'">'+(d>0?'+':d<0?'−':'±')+fmtNum(Math.abs(d))+' vs anterior</i>';break;}}
+  }else val='Logro';
+  var ic=av.tipo==='logro'
+    ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 3 6.5 7 .9-5.2 4.8 1.4 7L12 17.8 5.8 21.2l1.4-7L2 9.4l7-.9z"/></svg>'
+    :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>';
+  var who=showName?(al?'<button class="lk" data-a="ficha" data-id="'+al.id+'">'+esc(al.nombre)+'</button> · ':'Alumno dado de baja · '):'';
+  return '<div class="avi"><span class="ic '+av.tipo+'">'+ic+'</span><div class="grow"><b>'+esc(av.ejercicio)+'</b><small>'+who+dmy(pd(av.fecha))+(av.tipo==='logro'?' · Logro':' · Marca')+'</small>'+(av.nota?'<div class="nt">'+esc(av.nota)+'</div>':'')+'</div><div class="val">'+val+dl+'</div><button class="x" data-a="delav" data-id="'+av.id+'" aria-label="Borrar avance">&times;</button></div>';
+}
+
+function fichaView(){
+  var a=byId(S.fichaId);if(!a)return alumnosView();
+  var back='<button class="btn sm" data-a="go" data-v="alumnos">&larr; Alumnos</button>';
+  if(!S.F||S.F.id!==a.id){loadFicha(a.id);return mlogo()+head('Alumno',esc(a.nombre),back)+'<div class="loading">Cargando...</div>';}
+  var F=S.F, p=planOf(a);
+  var tel=a.wa?'<a href="https://wa.me/'+waNum(a)+'" target="_blank" rel="noopener">'+esc(a.wa)+'</a>':'—';
+  var dir=a.dir?esc(a.dir)+' · <a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a.dir)+'" target="_blank" rel="noopener">mapa</a>':'—';
+  var pgs=F.pagos.length?F.pagos.map(function(x){
+    return '<div class="line"><div class="grow"><b>'+money(+x.monto)+'</b><small>'+dmy(pd(x.fecha_pago))+' · '+esc((PLANES[x.plan_id]||{n:'Plan'}).n)+' · '+(METODOS[x.metodo]||x.metodo)+'</small></div><small style="color:var(--mut)">Recibo N° '+pad(x.recibo_nro)+'</small></div>';}).join('')
+    :'<div class="empty" style="padding:18px 0">Todavía no registró pagos.</div>';
+  var nl=F.avances.filter(function(x){return x.tipo==='logro';}).length, nm=F.avances.length-nl;
+  var avs=F.avances.length?F.avances.map(function(x,i){return avItem(x,F.avances,i,false);}).join('')
+    :'<div class="empty" style="padding:18px 0">Todavía no hay avances. Registrá el primero.</div>';
+  return mlogo()+head('Alumno',esc(a.nombre),back)+
+  '<div class="g-fi"><div class="stack">'+
+    '<section class="card dat">'+
+      '<div class="r"><span>Teléfono</span><span>'+tel+'</span></div>'+
+      '<div class="r"><span>Dirección</span><span>'+dir+'</span></div>'+
+      '<div class="r"><span>Plan</span><span>'+esc(p.n)+' · '+money(p.p)+'</span></div>'+
+      '<div class="r"><span>Cuota</span><span>'+venceTxt(a)+' &nbsp;'+badge(a)+'</span></div>'+
+      '<div class="r"><span>Alumno desde</span><span>'+dmy(a.alta)+'</span></div>'+
+      (a.notas?'<div class="r"><span>Notas</span><span>'+esc(a.notas)+'</span></div>':'')+
+    '</section>'+
+    '<div class="acts3"><button class="btn primary" data-a="cobrar" data-id="'+a.id+'">Cobrar cuota</button><button class="btn ghost" data-a="nuevoav" data-id="'+a.id+'">Registrar avance</button><button class="btn" data-a="editar" data-id="'+a.id+'">Editar datos</button><button class="btn danger" data-a="baja" data-id="'+a.id+'">Dar de baja</button></div>'+
+    '<section><div class="sec"><h2 class="title h2">Últimos pagos</h2></div>'+pgs+'</section>'+
+  '</div><section><div class="sec"><h2 class="title h2">Progreso</h2><span class="muted" style="font-size:13px">'+nl+' logros · '+nm+' marcas</span></div>'+avs+'</section></div>';
+}
+
+function progresoView(){
+  var add='<button class="btn primary" data-a="nuevoav" aria-label="Registrar avance"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Nuevo avance</span></button>';
+  if(S.AV===null){loadAV();return mlogo()+head('Seguimiento','Progreso',add)+'<div class="loading">Cargando...</div>';}
+  var m0=iso(new Date(hoy.getFullYear(),hoy.getMonth(),1));
+  var mes=S.AV.filter(function(x){return x.fecha>=m0;}), quienes={};
+  mes.forEach(function(x){quienes[x.alumno_id]=1;});
+  var nl=mes.filter(function(x){return x.tipo==='logro';}).length;
+  var chips=[['todos','Todos'],['logro','Logros'],['marca','Marcas']].map(function(c){
+    return '<button class="chip'+(S.avF===c[0]?' on':'')+'" data-a="avfiltro" data-k="'+c[0]+'">'+c[1]+'</button>';}).join('');
+  var lista=S.AV.filter(function(x){return S.avF==='todos'||x.tipo===S.avF;});
+  var items=lista.length?lista.map(function(x){return avItem(x,S.AV,S.AV.indexOf(x),true);}).join('')
+    :'<div class="empty">'+(S.AV.length?'No hay avances de ese tipo.':'Todavía no registraste avances. Tocá "Registrar avance" para cargar el primero.')+'</div>';
+  return mlogo()+head('Seguimiento','Progreso',add)+
+  '<section class="kpis" style="margin-bottom:18px" aria-label="Resumen del mes">'+
+    '<div class="kpi" style="--k:#F47B20"><div class="big-num">'+nl+'</div><span>Logros del mes</span></div>'+
+    '<div class="kpi" style="--k:#4ADE80"><div class="big-num">'+(mes.length-nl)+'</div><span>Marcas del mes</span></div>'+
+    '<div class="kpi" style="--k:#FACC15"><div class="big-num">'+Object.keys(quienes).length+'</div><span>Alumnos con avances</span></div></section>'+
+  '<div class="chips" style="margin-bottom:14px">'+chips+'</div>'+items;
+}
+
+function planesView(){
+  var cnt={};alumnos.forEach(function(a){cnt[a.plan]=(cnt[a.plan]||0)+1;});
+  var arch=Object.keys(PLANES).filter(function(k){return !PLANES[k].act;});
+  function card(k,ar){var p=PLANES[k];
+    return '<div class="card plan'+(ar?' arch':'')+'"><div class="grow"><b>'+esc(p.n)+'</b><small>'+durTxt(p.m)+' · '+(cnt[k]||0)+(cnt[k]===1?' alumno':' alumnos')+'</small></div><div class="pr">'+money(p.p)+'</div>'+
+    '<div class="a2"><button class="btn ghost sm" data-a="edplan" data-id="'+k+'">Editar</button><button class="btn sm" data-a="arcplan" data-id="'+k+'">'+(ar?'Reactivar':'Archivar')+'</button></div></div>';}
+  var add='<button class="btn primary" data-a="nuevoplan" aria-label="Nuevo plan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Nuevo plan</span></button>';
+  return mlogo()+head(esc(GYM.nombre),'Planes',add)+
+  '<p class="muted" style="margin:0 0 16px;font-size:14px">Son las cuotas que ofrecés. Al cobrar, el sistema suma la duración del plan al vencimiento del alumno.</p>'+
+  (PLAN_ORD.length?PLAN_ORD.map(function(k){return card(k,false);}).join(''):'<div class="empty">Todavía no creaste planes. Tocá "Nuevo plan" para crear el primero.</div>')+
+  (arch.length?'<div class="sec" style="margin-top:26px"><h2 class="title h2">Archivados</h2></div>'+arch.map(function(k){return card(k,true);}).join(''):'');
 }
 
 /* ===== Render y navegación ===== */
 var $v=document.getElementById('view');
-var VIEWS={home:home,alumnos:alumnosView,pago:pagoView,asistencia:asistenciaView,avisos:avisosView};
+var VIEWS={home:home,alumnos:alumnosView,alumno:fichaView,pago:pagoView,asistencia:asistenciaView,progreso:progresoView,planes:planesView,avisos:avisosView};
 function render(){
   if(!S.cargado)return;
   $v.innerHTML=VIEWS[S.view]();
   var bs=document.querySelectorAll('.nav [data-v]');
-  for(var i=0;i<bs.length;i++){var on=bs[i].getAttribute('data-v')===S.view;bs[i].classList.toggle('on',on);if(on)bs[i].setAttribute('aria-current','page');else bs[i].removeAttribute('aria-current');}
-  document.title='BLAZAR TEAM · '+TITLES[S.view];
+  var cur=S.view==='alumno'?'alumnos':S.view;
+  for(var i=0;i<bs.length;i++){var on=bs[i].getAttribute('data-v')===cur;bs[i].classList.toggle('on',on);if(on)bs[i].setAttribute('aria-current','page');else bs[i].removeAttribute('aria-current');}
+  document.title=GYM.nombre+' · '+TITLES[S.view];
 }
-function fromHash(){var v=(location.hash||'').replace('#/','');return VIEWS[v]?v:'home';}
+function fromHash(){var v=(location.hash||'').replace('#/','');if(v==='alumno'&&!byId(S.fichaId))return 'alumnos';return VIEWS[v]?v:'home';}
 function go(v){
   if(location.hash==='#/'+v){S.view=v;if(v!=='pago')S.pagado=null;render();window.scrollTo(0,0);}
   else location.hash='#/'+v;
@@ -463,27 +681,85 @@ function cargar(){
   var ini1=new Date(hoy.getFullYear(),hoy.getMonth(),1);
   return db.from('gym_members').select('gym_id,gyms(nombre,ultimo_recibo)').limit(1).then(function(g){
     if(g.error)throw g.error;
-    if(!g.data||!g.data.length)throw new Error('Tu usuario no está asociado a ningún gimnasio.');
+    if(!g.data||!g.data.length){var ne=new Error('sin gimnasio');ne.nogym=true;throw ne;}
     GYM={id:g.data[0].gym_id,nombre:g.data[0].gyms.nombre};
     S.recibo=(g.data[0].gyms.ultimo_recibo||0)+1;
     return Promise.all([
-      db.from('planes').select('id,nombre,precio,meses').eq('activo',true).order('precio'),
-      db.from('alumnos').select('id,nombre,whatsapp,plan_id,vence,fecha_alta').eq('activo',true).order('nombre').limit(2000),
+      db.from('planes').select('id,nombre,precio,meses,activo').order('precio'),
+      db.from('alumnos').select('id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta').eq('activo',true).order('nombre').limit(2000),
       db.from('pagos').select('alumno_id,plan_id,monto,metodo,fecha_pago,vence_hasta,recibo_nro').gte('fecha_pago',iso(ini1)).order('created_at'),
       db.from('asistencias').select('alumno_id,fecha').gte('fecha',iso(add(hoy,-14)))
     ]);
   }).then(function(r){
     for(var i=0;i<r.length;i++)if(r[i].error)throw r[i].error;
-    PLANES={};PLAN_ORD=[];
-    r[0].data.forEach(function(p){PLANES[p.id]={n:p.nombre,p:+p.precio,m:+p.meses};PLAN_ORD.push(p.id);});
-    alumnos=r[1].data.map(function(x){return {id:x.id,nombre:x.nombre,wa:x.whatsapp||'',plan:x.plan_id,vence:x.vence?pd(x.vence):hoy,alta:pd(x.fecha_alta)};});
+    PLANES={};
+    r[0].data.forEach(function(p){PLANES[p.id]=mapPlan(p);});rebuildOrd();
+    alumnos=r[1].data.map(mapAl);
     pagos=r[2].data.map(function(p){return {id:p.alumno_id,monto:+p.monto,metodo:p.metodo,fecha:pd(p.fecha_pago),recibo:p.recibo_nro,plan:p.plan_id,vence:pd(p.vence_hasta)};}).filter(function(p){return byId(p.id);});
     ULT={};S.pres=new Set();
     r[3].data.forEach(function(x){ULT[x.alumno_id]=pd(x.fecha);if(x.fecha===iso(hoy))S.pres.add(x.alumno_id);});
-    var sel=document.getElementById('selPlanNuevo');
-    sel.innerHTML=PLAN_ORD.map(function(k){return '<option value="'+k+'">'+esc(PLANES[k].n)+' · '+money(PLANES[k].p)+'</option>';}).join('');
+    S.F=null;S.AV=null;
     S.cargado=true;
   });
+}
+
+function loadAV(){
+  if(S.avLoading)return;S.avLoading=true;
+  db.from('avances').select('id,alumno_id,fecha,ejercicio,tipo,valor,unidad,nota').order('fecha',{ascending:false}).order('created_at',{ascending:false}).limit(150).then(function(r){
+    S.avLoading=false;
+    if(fail(r,'No se pudieron cargar los avances'))r={data:[]};
+    S.AV=(r.data||[]).map(function(x){x.valor=x.valor===null?null:+x.valor;return x;});
+    if(S.view==='progreso')render();
+  });
+}
+function loadFicha(id){
+  if(S.fLoading===id)return;S.fLoading=id;
+  Promise.all([
+    db.from('pagos').select('plan_id,monto,metodo,fecha_pago,recibo_nro').eq('alumno_id',id).order('fecha_pago',{ascending:false}).limit(12),
+    db.from('avances').select('id,alumno_id,fecha,ejercicio,tipo,valor,unidad,nota').eq('alumno_id',id).order('fecha',{ascending:false}).order('created_at',{ascending:false}).limit(100)
+  ]).then(function(r){
+    S.fLoading=null;
+    var e=fail(r[0],'No se pudo cargar el historial')||fail(r[1],'No se pudieron cargar los avances');
+    S.F={id:id,pagos:e?[]:r[0].data,avances:e?[]:r[1].data.map(function(x){x.valor=x.valor===null?null:+x.valor;return x;})};
+    if(S.view==='alumno'&&S.fichaId===id)render();
+  });
+}
+function fillPlanSel(sel,cur){
+  var ks=PLAN_ORD.slice();if(cur&&PLANES[cur]&&ks.indexOf(cur)<0)ks.push(cur);
+  sel.innerHTML=ks.map(function(k){return '<option value="'+k+'">'+esc(PLANES[k].n)+' · '+money(PLANES[k].p)+(PLANES[k].act?'':' (archivado)')+'</option>';}).join('');
+  if(cur&&PLANES[cur])sel.value=cur;
+}
+function openAlumno(id){
+  if(!id&&!PLAN_ORD.length){toast('Primero creá al menos un plan.');go('planes');return;}
+  var f=document.getElementById('fNuevo');f.reset();S.edit=id||null;
+  var a=id?byId(id):null;
+  document.getElementById('dlgT').textContent=a?'Editar alumno':'Nuevo alumno';
+  document.getElementById('btnAl').textContent=a?'Guardar':'Agregar';
+  fillPlanSel(f.plan,a&&a.plan);
+  if(a){f.nombre.value=a.nombre;f.wa.value=a.wa;f.dir.value=a.dir;f.vence.value=iso(a.vence);f.notas.value=a.notas;}
+  else f.vence.value=iso(hoy);
+  document.getElementById('dlg').showModal();
+}
+function openPlan(id){
+  var f=document.getElementById('fPlan');f.reset();S.editPlan=id||null;
+  var p=id?PLANES[id]:null;
+  document.getElementById('dlgPlanT').textContent=p?'Editar plan':'Nuevo plan';
+  document.getElementById('btnPlan').textContent=p?'Guardar':'Crear plan';
+  if(p){f.nombre.value=p.n;f.precio.value=p.p;f.meses.value=p.m;}
+  document.getElementById('dlgPlan').showModal();
+}
+function setTipo(){var f=document.getElementById('fAv'),mk=f.tipo.value==='marca';document.getElementById('mk').hidden=!mk;f.valor.required=mk;}
+function openAv(alId){
+  if(!alumnos.length){toast('Primero cargá alumnos.');go('alumnos');return;}
+  var f=document.getElementById('fAv');f.reset();
+  f.alumno.innerHTML='<option value="">Elegí un alumno</option>'+alumnos.map(function(x){return '<option value="'+x.id+'">'+esc(x.nombre)+'</option>';}).join('');
+  if(alId)f.alumno.value=alId;
+  f.fecha.value=iso(hoy);setTipo();
+  var ej={},out=[];
+  [].concat(S.AV||[],S.F?S.F.avances:[]).forEach(function(x){var k=x.ejercicio.toLowerCase();if(!ej[k]){ej[k]=1;out.push(x.ejercicio);}});
+  DEF_EJ.forEach(function(x){var k=x.toLowerCase();if(!ej[k]){ej[k]=1;out.push(x);}});
+  document.getElementById('ejlist').innerHTML=out.map(function(x){return '<option value="'+esc(x)+'">';}).join('');
+  document.getElementById('dlgAv').showModal();
 }
 
 /* ===== Eventos ===== */
@@ -491,6 +767,7 @@ document.addEventListener('click',function(e){
   var t=e.target.closest('[data-a]');if(!t)return;
   var a=t.getAttribute('data-a'), id=t.getAttribute('data-id'), k=t.getAttribute('data-k');
   if(a==='go'){go(t.getAttribute('data-v'));}
+  else if(a==='ficha'){S.fichaId=id;S.F=null;go('alumno');}
   else if(a==='cobrar'){setPago(id);go('pago');}
   else if(a==='recordar'){var al=byId(id),d=diff(al);S.avisoId=id;S.paso=d<0?'atraso':d===0?'dia':'antes';go('avisos');}
   else if(a==='filtro'){S.filtro=k;render();}
@@ -504,7 +781,7 @@ document.addEventListener('click',function(e){
       if(fail(r,'No se pudo registrar el pago')){render();return;}
       var d=r.data;
       var p={id:s.id,monto:+d.monto,metodo:d.metodo,fecha:pd(d.fecha_pago),recibo:d.recibo_nro,plan:d.plan_id,vence:pd(d.vence_hasta)};
-      s.plan=p.plan;s.vence=p.vence;pagos.push(p);S.recibo=p.recibo+1;S.pagado=p;render();window.scrollTo(0,0);
+      S.F=null;s.plan=p.plan;s.vence=p.vence;pagos.push(p);S.recibo=p.recibo+1;S.pagado=p;render();window.scrollTo(0,0);
     });
   }
   else if(a==='recibo'){S.avisoId=S.pagado.id;S.paso='recibo';go('avisos');}
@@ -520,9 +797,41 @@ document.addEventListener('click',function(e){
     });
   }
   else if(a==='paso'){S.paso=k;render();}
-  else if(a==='nuevo'){var f=document.getElementById('fNuevo');f.vence.value=iso(hoy);document.getElementById('dlg').showModal();}
-  else if(a==='cerrar'){document.getElementById('dlg').close();}
+  else if(a==='nuevo'){openAlumno(null);}
+  else if(a==='editar'){openAlumno(id);}
+  else if(a==='cerrar'){document.getElementById(k||'dlg').close();}
+  else if(a==='baja'){
+    var al2=byId(id);
+    if(al2&&confirm('¿Dar de baja a '+al2.nombre+'? Deja de aparecer en el sistema, pero se conserva su historial.')){
+      db.from('alumnos').update({activo:false}).eq('id',id).then(function(r){
+        if(fail(r,'No se pudo dar de baja'))return;
+        alumnos=alumnos.filter(function(x){return x.id!==id;});pagos=pagos.filter(function(x){return x.id!==id;});
+        S.pres.delete(id);S.F=null;S.AV=null;toast('Alumno dado de baja',true);go('alumnos');
+      });
+    }
+  }
+  else if(a==='nuevoplan'){openPlan(null);}
+  else if(a==='edplan'){openPlan(id);}
+  else if(a==='arcplan'){
+    var pl2=PLANES[id],en=alumnos.filter(function(x){return x.plan===id;}).length,nuevo=!pl2.act;
+    if(!nuevo&&en&&!confirm(en+(en===1?' alumno usa':' alumnos usan')+' este plan. Siguen con él, pero no vas a poder asignarlo a alumnos nuevos. ¿Archivar?'))return;
+    db.from('planes').update({activo:nuevo}).eq('id',id).then(function(r){
+      if(fail(r,'No se pudo actualizar el plan'))return;
+      pl2.act=nuevo;rebuildOrd();render();
+    });
+  }
+  else if(a==='nuevoav'){openAv(id);}
+  else if(a==='avfiltro'){S.avF=k;render();}
+  else if(a==='delav'){
+    if(confirm('¿Borrar este avance?')){
+      db.from('avances').delete().eq('id',id).then(function(r){
+        if(fail(r,'No se pudo borrar'))return;
+        S.AV=null;S.F=null;render();
+      });
+    }
+  }
   else if(a==='salir'){db.auth.signOut().then(function(){location.reload();});}
+  else if(a==='mode'){setMode(k);}
 });
 document.addEventListener('input',function(e){
   if(e.target.id==='q'){S.q=e.target.value;document.getElementById('lista').innerHTML=listaAlumnos();}
@@ -530,48 +839,141 @@ document.addEventListener('input',function(e){
 document.addEventListener('change',function(e){
   if(e.target.id==='selPago'){setPago(e.target.value);render();}
   else if(e.target.id==='selAviso'){S.avisoId=e.target.value;render();}
+  else if(e.target.name==='tipo'&&e.target.form&&e.target.form.id==='fAv'){setTipo();}
 });
 document.getElementById('fNuevo').addEventListener('submit',function(e){
   e.preventDefault();
   var f=e.target, nombre=f.nombre.value.trim();if(!nombre||S.busy)return;
+  var d={nombre:nombre,whatsapp:f.wa.value.trim(),direccion:f.dir.value.trim(),plan_id:f.plan.value||null,vence:f.vence.value||null,notas:f.notas.value.trim()||null};
+  var cols='id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta', edit=S.edit;
   S.busy=true;
-  db.from('alumnos').insert({gym_id:GYM.id,nombre:nombre,whatsapp:f.wa.value.trim()||null,plan_id:f.plan.value||null,vence:f.vence.value||null})
-    .select('id,nombre,whatsapp,plan_id,vence,fecha_alta').single().then(function(r){
+  var q=edit?db.from('alumnos').update(d).eq('id',edit):db.from('alumnos').insert(Object.assign({gym_id:GYM.id},d));
+  q.select(cols).single().then(function(r){
     S.busy=false;
-    if(fail(r,'No se pudo agregar el alumno'))return;
-    var x=r.data;
-    alumnos.push({id:x.id,nombre:x.nombre,wa:x.whatsapp||'',plan:x.plan_id,vence:x.vence?pd(x.vence):hoy,alta:pd(x.fecha_alta)});
-    alumnos.sort(function(p,q){return p.nombre.localeCompare(q.nombre,'es');});
-    f.reset();document.getElementById('dlg').close();
-    S.filtro='todos';S.q='';if(S.view!=='alumnos'){go('alumnos');}else{render();}
+    if(fail(r,edit?'No se pudo guardar':'No se pudo agregar el alumno'))return;
+    var x=mapAl(r.data);
+    if(edit){alumnos=alumnos.map(function(o){return o.id===edit?x:o;});}else alumnos.push(x);
+    alumnos.sort(function(p,q2){return p.nombre.localeCompare(q2.nombre,'es');});
+    f.reset();document.getElementById('dlg').close();S.F=null;
+    if(edit){toast('Datos guardados',true);render();}
+    else{S.filtro='todos';S.q='';if(S.view!=='alumnos'){go('alumnos');}else{render();}}
+  });
+});
+document.getElementById('fPlan').addEventListener('submit',function(e){
+  e.preventDefault();if(S.busy)return;
+  var f=e.target,n=f.nombre.value.trim();if(!n)return;
+  var d={nombre:n,precio:parseFloat(f.precio.value),meses:parseInt(f.meses.value,10)||1};
+  if(!isFinite(d.precio)||d.precio<0){toast('Poné un precio válido.');return;}
+  var edit=S.editPlan;S.busy=true;
+  var q=edit?db.from('planes').update(d).eq('id',edit):db.from('planes').insert(Object.assign({gym_id:GYM.id},d));
+  q.select('id,nombre,precio,meses,activo').single().then(function(r){
+    S.busy=false;
+    if(fail(r,'No se pudo guardar el plan'))return;
+    PLANES[r.data.id]=mapPlan(r.data);rebuildOrd();
+    document.getElementById('dlgPlan').close();toast(edit?'Plan actualizado':'Plan creado',true);render();
+  });
+});
+document.getElementById('fAv').addEventListener('submit',function(e){
+  e.preventDefault();if(S.busy)return;
+  var f=e.target,tipo=f.tipo.value,valor=tipo==='marca'?parseFloat(f.valor.value):null;
+  if(tipo==='marca'&&!isFinite(valor)){toast('Cargá el valor de la marca.');return;}
+  S.busy=true;
+  db.from('avances').insert({gym_id:GYM.id,alumno_id:f.alumno.value,fecha:f.fecha.value,ejercicio:f.ejercicio.value.trim(),tipo:tipo,valor:valor,unidad:tipo==='marca'?f.unidad.value:null,nota:f.nota.value.trim()||null}).then(function(r){
+    S.busy=false;
+    if(fail(r,'No se pudo guardar el avance'))return;
+    document.getElementById('dlgAv').close();S.AV=null;S.F=null;toast('Avance registrado',true);render();
   });
 });
 
-/* ===== Sesión ===== */
+/* ===== Sesión y cuenta ===== */
 var $login=document.getElementById('login'), $shell=document.getElementById('shell');
-function mostrarLogin(){$shell.hidden=true;$login.hidden=false;}
+var $msg=document.getElementById('authMsg'), $err=document.getElementById('authErr');
+var REDIRECT=location.origin+location.pathname;
+var RECOVERY=/type=recovery/.test(location.hash);
+function setMode(m){
+  var fs=$login.querySelectorAll('form');
+  for(var i=0;i<fs.length;i++)fs[i].hidden=fs[i].getAttribute('data-m')!==m;
+  $msg.textContent='';$err.textContent='';
+}
+function mostrarLogin(m){$shell.hidden=true;$login.hidden=false;setMode(m||'login');}
+function authErr(e){
+  var t=(e&&e.message)||'';
+  if(/invalid login/i.test(t))return 'Email o contraseña incorrectos.';
+  if(/not confirmed/i.test(t))return 'Todavía no confirmaste tu email. Revisá tu correo.';
+  if(/already registered|already been registered/i.test(t))return 'Ese email ya tiene una cuenta. Probá entrar o recuperar la contraseña.';
+  if(/rate limit|too many/i.test(t)||(e&&e.status===429))return 'Demasiados intentos. Esperá unos minutos y probá de nuevo.';
+  if(/password/i.test(t))return 'La contraseña no es válida (mínimo 8 caracteres).';
+  return t||'No se pudo completar. Probá de nuevo.';
+}
+function busyBtn(f,on){var b=f.querySelector('[type=submit]');if(b)b.disabled=on;}
 function entrar(){
   $login.hidden=true;$shell.hidden=false;
   $v.innerHTML='<div class="loading">Cargando...</div>';
   cargar().then(function(){S.view=fromHash();render();}).catch(function(err){
+    if(err&&err.nogym){mostrarLogin('gym');return;}
     console.error(err);
-    db.auth.signOut();mostrarLogin();
-    document.getElementById('loginErr').textContent=err.message||'No se pudieron cargar los datos.';
+    db.auth.signOut();mostrarLogin('login');
+    $err.textContent=err.message||'No se pudieron cargar los datos.';
   });
 }
 document.getElementById('fLogin').addEventListener('submit',function(e){
-  e.preventDefault();
-  var f=e.target,btn=document.getElementById('loginBtn'),er=document.getElementById('loginErr');
-  er.textContent='';btn.disabled=true;
+  e.preventDefault();var f=e.target;$err.textContent='';busyBtn(f,true);
   db.auth.signInWithPassword({email:f.email.value.trim(),password:f.pass.value}).then(function(r){
-    btn.disabled=false;
-    if(r.error){er.textContent='Email o contraseña incorrectos.';return;}
+    busyBtn(f,false);
+    if(r.error){$err.textContent=authErr(r.error);return;}
     f.pass.value='';entrar();
   });
 });
+document.getElementById('fSignup').addEventListener('submit',function(e){
+  e.preventDefault();var f=e.target;$err.textContent='';$msg.textContent='';
+  if(f.pass.value!==f.pass2.value){$err.textContent='Las contraseñas no coinciden.';return;}
+  busyBtn(f,true);
+  db.auth.signUp({email:f.email.value.trim(),password:f.pass.value,options:{emailRedirectTo:REDIRECT}}).then(function(r){
+    busyBtn(f,false);
+    if(r.error){$err.textContent=authErr(r.error);return;}
+    if(r.data&&r.data.session){f.reset();entrar();return;}
+    // email ya registrado: Supabase devuelve un usuario sin identidades
+    if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){$err.textContent=authErr({message:'already registered'});return;}
+    var em=f.email.value.trim();f.reset();setMode('login');
+    $msg.textContent='Te enviamos un correo a '+em+'. Confirmá tu email y después entrá.';
+  });
+});
+document.getElementById('fForgot').addEventListener('submit',function(e){
+  e.preventDefault();var f=e.target;$err.textContent='';$msg.textContent='';busyBtn(f,true);
+  db.auth.resetPasswordForEmail(f.email.value.trim(),{redirectTo:REDIRECT}).then(function(r){
+    busyBtn(f,false);
+    if(r.error){$err.textContent=authErr(r.error);return;}
+    f.reset();setMode('login');
+    $msg.textContent='Si el email tiene una cuenta, te enviamos un enlace para cambiar la contraseña.';
+  });
+});
+document.getElementById('fReset').addEventListener('submit',function(e){
+  e.preventDefault();var f=e.target;$err.textContent='';
+  if(f.pass.value!==f.pass2.value){$err.textContent='Las contraseñas no coinciden.';return;}
+  busyBtn(f,true);
+  db.auth.updateUser({password:f.pass.value}).then(function(r){
+    busyBtn(f,false);
+    if(r.error){$err.textContent=authErr(r.error);return;}
+    RECOVERY=false;f.reset();history.replaceState(null,'',REDIRECT);toast('Contraseña actualizada');entrar();
+  });
+});
+document.getElementById('fGym').addEventListener('submit',function(e){
+  e.preventDefault();var f=e.target;$err.textContent='';busyBtn(f,true);
+  db.rpc('crear_gym',{p_nombre:f.nombre.value.trim(),p_planes:[]}).then(function(r){
+    busyBtn(f,false);
+    if(r.error){$err.textContent=authErr(r.error);return;}
+    entrar();
+  });
+});
+db.auth.onAuthStateChange(function(ev){
+  if(ev==='PASSWORD_RECOVERY'){RECOVERY=true;mostrarLogin('reset');}
+});
 
 S.view=fromHash();
-db.auth.getSession().then(function(r){if(r.data&&r.data.session)entrar();else mostrarLogin();});
+db.auth.getSession().then(function(r){
+  if(RECOVERY){mostrarLogin('reset');return;}
+  if(r.data&&r.data.session)entrar();else mostrarLogin('login');
+});
 })();
 </script>
 </body>
