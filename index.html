@@ -293,6 +293,7 @@ textarea.input{padding:12px 14px;resize:vertical;min-height:72px;line-height:1.3
     <form id="fGym" data-m="gym" hidden>
       <h1 class="ttl">Tu gimnasio</h1>
       <p class="sub">Un último paso: ponele nombre a tu gimnasio. Los planes de cuota los creás después, en la sección Planes.</p>
+      <label class="field">Tu nombre<input class="input" name="usuario" required minlength="2" maxlength="40" autocomplete="given-name" placeholder="Ej: Eze"></label>
       <label class="field">Nombre del gimnasio<input class="input" name="nombre" required minlength="2" autocomplete="organization"></label>
       <button type="submit" class="btn primary big">CREAR GIMNASIO</button>
       <div class="links"><button type="button" class="link" data-a="salir">Cerrar sesión</button></div>
@@ -456,7 +457,7 @@ function home(){
   var listaAct=act.map(function(p){var a=byId(p.id);
     return '<div class="line"><div class="av">'+ini(a.nombre)+'</div><div class="grow"><b>'+esc(a.nombre)+'</b><small>'+METODOS[p.metodo]+' · Recibo N° '+pad(p.recibo)+'</small></div><b style="font-size:14px">'+money(p.monto)+'</b></div>';}).join('');
 
-  return mlogo()+head(hf,'Hola, profe','<button class="btn ghost sm" data-a="salir">Salir</button>')+
+  return mlogo()+head(hf,'Hola, '+esc(GYM.usuario||'profe'),'<button class="btn ghost sm" data-a="salir">Salir</button>')+
   (!PLAN_ORD.length?'<div class="hint"><b>Para empezar, creá tus planes de cuota (nombre, precio y duración).</b><button class="btn primary" data-a="go" data-v="planes">Crear planes</button></div>':'')+
   '<div class="g-home">'+
     '<section class="card c-rev"><div class="eyebrow">Cobrado este mes</div><div class="big-num rev-num">'+money(cobrado)+'</div>'+
@@ -688,10 +689,12 @@ function cargar(){
       db.from('planes').select('id,nombre,precio,meses,activo').order('precio'),
       db.from('alumnos').select('id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta').eq('activo',true).order('nombre').limit(2000),
       db.from('pagos').select('alumno_id,plan_id,monto,metodo,fecha_pago,vence_hasta,recibo_nro').gte('fecha_pago',iso(ini1)).order('created_at'),
-      db.from('asistencias').select('alumno_id,fecha').gte('fecha',iso(add(hoy,-14)))
+      db.from('asistencias').select('alumno_id,fecha').gte('fecha',iso(add(hoy,-14))),
+      db.from('gym_members').select('nombre').limit(1)
     ]);
   }).then(function(r){
-    for(var i=0;i<r.length;i++)if(r[i].error)throw r[i].error;
+    for(var i=0;i<4;i++)if(r[i].error)throw r[i].error;
+    GYM.usuario=(!r[4].error&&r[4].data&&r[4].data[0]&&r[4].data[0].nombre)||'';
     PLANES={};
     r[0].data.forEach(function(p){PLANES[p.id]=mapPlan(p);});rebuildOrd();
     alumnos=r[1].data.map(mapAl);
@@ -959,7 +962,7 @@ document.getElementById('fReset').addEventListener('submit',function(e){
 });
 document.getElementById('fGym').addEventListener('submit',function(e){
   e.preventDefault();var f=e.target;$err.textContent='';busyBtn(f,true);
-  db.rpc('crear_gym',{p_nombre:f.nombre.value.trim(),p_planes:[]}).then(function(r){
+  db.rpc('crear_gym',{p_nombre:f.nombre.value.trim(),p_planes:[],p_usuario:f.usuario.value.trim()}).then(function(r){
     busyBtn(f,false);
     if(r.error){$err.textContent=authErr(r.error);return;}
     entrar();
