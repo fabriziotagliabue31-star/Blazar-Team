@@ -347,6 +347,10 @@ img.lgl{display:none}
 .nav .who:hover{background:var(--hov)}
 .nav .who>svg{margin-left:auto;color:var(--mut);flex:none}
 .firmaprev{background:#fff;border-style:solid;border-color:var(--line)}
+.fpad{display:block;width:100%;height:220px;background:#fff;border:1px dashed var(--line2);border-radius:12px;touch-action:none;cursor:crosshair}
+.fpad-wrap{position:relative}
+.fpad-hint{position:absolute;left:0;right:0;bottom:34px;text-align:center;color:#9aa0a6;font-size:13px;pointer-events:none}
+.fpad-line{position:absolute;left:6%;right:6%;bottom:56px;border-top:1px solid #d5d8dc;pointer-events:none}
 .firma-img{display:block;max-height:90px;max-width:100%;object-fit:contain}
 </style>
 </head>
@@ -437,6 +441,19 @@ img.lgl{display:none}
       <button type="submit" class="btn primary" id="btnAl">Agregar</button>
     </div>
   </form>
+</dialog>
+
+<dialog class="dlg dlg-wide" id="dlgFirma" aria-labelledby="dlgFirmaT">
+  <div class="stack">
+    <h2 class="title h2" id="dlgFirmaT">Firmá acá</h2>
+    <p class="sub2">Dibujá tu firma con el dedo (o el mouse) dentro del recuadro. Si no te gusta, tocá Borrar y repetí.</p>
+    <div class="fpad-wrap"><canvas class="fpad" id="fpad"></canvas><div class="fpad-line"></div><div class="fpad-hint" id="fpadHint">Firmá sobre la línea</div></div>
+    <div class="acts">
+      <button type="button" class="btn" data-a="cerrar" data-k="dlgFirma">Cancelar</button>
+      <button type="button" class="btn" data-a="firmaborrar">Borrar</button>
+      <button type="button" class="btn primary" data-a="firmaguardar">Guardar firma</button>
+    </div>
+  </div>
 </dialog>
 
 <dialog class="dlg dlg-wide" id="dlgImp" aria-labelledby="dlgImpT">
@@ -1288,9 +1305,9 @@ function ajustesView(){
       '<div class="acts3"><button type="button" class="btn primary" data-a="logoelegir">Subir logo</button><button type="button" class="btn" data-a="logoquitar"'+(GYM.logo?'':' disabled')+'>Quitar logo</button></div></section>'+
     '<section class="card stack"><h2 class="title h2">Firma</h2>'+
       '<div class="logoprev firmaprev">'+(GYM.firma?'<img class="firma-img" src="'+GYM.firma+'" alt="Firma">':'<span class="muted" style="font-size:13px">Sin firma cargada</span>')+'</div>'+
-      '<p class="sub2">Subí una foto de tu firma hecha con lapicera sobre papel blanco. La app le saca el fondo y la imprime en cada recibo.</p>'+
+      '<p class="sub2">Firmá una sola vez con el dedo en la pantalla (o subí una foto de tu firma en papel blanco). La app la guarda y la imprime en cada recibo.</p>'+
       '<input type="file" id="firmaFile" accept="image/*" hidden>'+
-      '<div class="acts3"><button type="button" class="btn primary" data-a="firmaelegir">Subir firma</button><button type="button" class="btn" data-a="firmaquitar"'+(GYM.firma?'':' disabled')+'>Quitar firma</button></div>'+
+      '<div class="acts3"><button type="button" class="btn primary" data-a="firmadibujar">Firmar con el dedo</button><button type="button" class="btn" data-a="firmaelegir">Subir foto</button><button type="button" class="btn" data-a="firmaquitar"'+(GYM.firma?'':' disabled')+'>Quitar firma</button></div>'+
       '<form id="fFirma" class="stack"><label class="field">Aclaración (el nombre que va debajo de la firma)<input class="input" name="firmante" maxlength="80" placeholder="Ej: Ezequiel Gómez · Titular" value="'+esc(GYM.firmante||'')+'"></label><button type="submit" class="btn">Guardar aclaración</button></form></section>'+
     '<section class="card stack"><h2 class="title h2">Cuenta</h2><div class="sub2">Sesión iniciada como <b style="color:var(--tx)">'+esc(GYM.usuario||'Administrador')+'</b>.</div>'+
       '<button type="button" class="btn" data-a="salir">Cerrar sesión</button><div class="by" style="margin-top:4px">Desarrollado por Vertag Solutions.</div></section>'+
@@ -1402,6 +1419,40 @@ function limpiarFirma(img){
   var cw=maxX-minX+1,ch=maxY-minY+1,c2=document.createElement('canvas');c2.width=cw;c2.height=ch;c2.getContext('2d').drawImage(c,minX,minY,cw,ch,0,0,cw,ch);
   return c2.toDataURL('image/png');
 }
+var PAD={ctx:null,dibujando:false,hay:false,last:null};
+function abrirPad(){
+  var dlg=document.getElementById('dlgFirma');dlg.showModal();
+  var c=document.getElementById('fpad'),r=c.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  c.width=Math.round(r.width*dpr);c.height=Math.round(r.height*dpr);
+  var x=c.getContext('2d');x.lineCap='round';x.lineJoin='round';x.strokeStyle='#14233f';x.lineWidth=3.2*dpr;
+  PAD.ctx=x;PAD.hay=false;PAD.dibujando=false;PAD.dpr=dpr;
+  document.getElementById('fpadHint').style.display='';
+}
+function padPos(e){var c=document.getElementById('fpad'),r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*(c.width/r.width),y:(e.clientY-r.top)*(c.height/r.height)};}
+document.addEventListener('pointerdown',function(e){
+  if(e.target.id!=='fpad'||!PAD.ctx)return;
+  e.preventDefault();try{e.target.setPointerCapture(e.pointerId);}catch(_){}
+  PAD.dibujando=true;PAD.last=padPos(e);PAD.hay=true;document.getElementById('fpadHint').style.display='none';
+  PAD.ctx.beginPath();PAD.ctx.arc(PAD.last.x,PAD.last.y,PAD.ctx.lineWidth/2,0,6.283);PAD.ctx.fillStyle='#14233f';PAD.ctx.fill();
+});
+document.addEventListener('pointermove',function(e){
+  if(!PAD.dibujando||e.target.id!=='fpad')return;
+  e.preventDefault();var p=padPos(e),m={x:(PAD.last.x+p.x)/2,y:(PAD.last.y+p.y)/2};
+  PAD.ctx.beginPath();PAD.ctx.moveTo(PAD.last.x,PAD.last.y);PAD.ctx.quadraticCurveTo(PAD.last.x,PAD.last.y,m.x,m.y);PAD.ctx.lineTo(p.x,p.y);PAD.ctx.stroke();PAD.last=p;
+});
+['pointerup','pointercancel'].forEach(function(t){document.addEventListener(t,function(){PAD.dibujando=false;});});
+function guardarPad(){
+  if(!PAD.hay){toast('Primero firmá en el recuadro.');return;}
+  var c=document.getElementById('fpad'),w=c.width,h=c.height,id=c.getContext('2d').getImageData(0,0,w,h),d=id.data,minX=w,minY=h,maxX=-1,maxY=-1,xx,yy;
+  for(yy=0;yy<h;yy++)for(xx=0;xx<w;xx++){if(d[(yy*w+xx)*4+3]>40){if(xx<minX)minX=xx;if(xx>maxX)maxX=xx;if(yy<minY)minY=yy;if(yy>maxY)maxY=yy;}}
+  if(maxX<0){toast('Primero firmá en el recuadro.');return;}
+  var pad=10;minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(w-1,maxX+pad);maxY=Math.min(h-1,maxY+pad);
+  var cw=maxX-minX+1,ch=maxY-minY+1,sc=Math.min(1,900/cw),c2=document.createElement('canvas');c2.width=Math.max(1,Math.round(cw*sc));c2.height=Math.max(1,Math.round(ch*sc));
+  c2.getContext('2d').drawImage(c,minX,minY,cw,ch,0,0,c2.width,c2.height);
+  var url=c2.toDataURL('image/png');
+  if(url.length>290000){toast('La firma quedó muy pesada. Hacela más simple.');return;}
+  document.getElementById('dlgFirma').close();PAD.ctx=null;guardarFirma(url);
+}
 function procesarFirma(file){
   if(!file)return;
   if(file.size>8*1024*1024){toast('La foto es demasiado pesada (máx. 8 MB).');return;}
@@ -1495,6 +1546,9 @@ document.addEventListener('click',function(e){
   }
   else if(a==='salir'){db.auth.signOut().then(function(){location.reload();});}
   else if(a==='importar'){openImport();}
+  else if(a==='firmadibujar'){abrirPad();}
+  else if(a==='firmaborrar'){var cf=document.getElementById('fpad');if(PAD.ctx){PAD.ctx.clearRect(0,0,cf.width,cf.height);PAD.hay=false;document.getElementById('fpadHint').style.display='';}}
+  else if(a==='firmaguardar'){guardarPad();}
   else if(a==='firmaelegir'){document.getElementById('firmaFile').click();}
   else if(a==='firmaquitar'){if(GYM.firma&&confirm('¿Quitar la firma?'))guardarFirma(null);}
   else if(a==='logoelegir'){document.getElementById('logoFile').click();}
