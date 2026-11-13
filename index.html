@@ -644,7 +644,8 @@ function pagoView(){
       '<div class="r"><span>Fecha</span><span>'+dmy(p.fecha)+'</span></div>'+
       '<div class="r"><span>Monto</span><b>'+money(p.monto)+'</b></div>'+
       '<div class="r"><span>Próximo vencimiento</span><span>'+dmy(p.vence)+'</span></div></section>'+
-      '<button class="btn primary big" data-a="comp" style="font-family:Barlow,sans-serif;font-style:normal;font-size:16px;letter-spacing:0;min-height:52px">Compartir comprobante (PDF)</button>'+
+      '<button class="btn primary big" data-a="comp" style="font-family:Barlow,sans-serif;font-style:normal;font-size:16px;letter-spacing:0;min-height:52px">'+(esMovil()?'Compartir comprobante (PDF)':'Descargar comprobante (PDF)')+'</button>'+
+      (esMovil()?'<button class="btn" data-a="compdl" style="min-height:52px">Descargar PDF</button>':'')+
       '<button class="btn" data-a="recibo" style="min-height:52px">Enviar aviso por WhatsApp</button>'+
       '<button class="btn" data-a="go" data-v="home" style="min-height:52px">Volver al tablero</button>'+
     '</div></div>';
@@ -1194,12 +1195,13 @@ function hacerComprobante(d){
     return new Promise(function(ok,no){c.toBlob(function(b){b?ok(b):no(new Error('No se pudo generar la imagen'));},'image/jpeg',0.93);}).then(function(b){return b.arrayBuffer();}).then(function(buf){return pdfDesdeJpeg(new Uint8Array(buf),W,H);});
   });
 }
-function compartirComprobante(info){
+function esMovil(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));}
+function compartirComprobante(info,soloDescargar){
   toast('Generando comprobante...',true);
   hacerComprobante(info).catch(function(e){if(e&&e.name==='SecurityError')return hacerComprobante(Object.assign({},info,{sinLogo:true}));throw e;}).then(function(blob){
     var nombre='comprobante-'+pad(info.recibo)+'.pdf',file;
     try{file=new File([blob],nombre,{type:'application/pdf'});}catch(e){file=null;}
-    if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    if(!soloDescargar&&esMovil()&&file&&navigator.canShare&&navigator.canShare({files:[file]})){
       return navigator.share({files:[file],title:'Comprobante de pago',text:GYM.nombre+' · Recibo N° '+pad(info.recibo)}).catch(function(err){if(err&&err.name==='AbortError')return;throw err;});
     }
     var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nombre;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);
@@ -1358,6 +1360,7 @@ document.addEventListener('click',function(e){
   else if(a==='logoelegir'){document.getElementById('logoFile').click();}
   else if(a==='logoquitar'){if(GYM.logo&&confirm('¿Quitar el logo?'))guardarLogo(null);}
   else if(a==='comp'){if(S.pagado)compartirComprobante(infoPago(S.pagado,byId(S.pagado.id)));}
+  else if(a==='compdl'){if(S.pagado)compartirComprobante(infoPago(S.pagado,byId(S.pagado.id)),true);}
   else if(a==='compficha'){
     var px=S.F&&S.F.pagos.filter(function(y){return String(y.recibo_nro)===t.getAttribute('data-n');})[0],al2=byId(S.fichaId);
     if(px&&al2)compartirComprobante(infoPago({recibo:px.recibo_nro,plan:px.plan_id,metodo:px.metodo,fecha:pd(px.fecha_pago),vence:pd(px.vence_hasta||px.fecha_pago),monto:+px.monto},al2));
