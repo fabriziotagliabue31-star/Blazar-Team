@@ -433,6 +433,10 @@ img.lgl{display:none}
     <label class="field">Nombre y apellido<input class="input" name="nombre" required autocomplete="off"></label>
     <label class="field">Teléfono (WhatsApp)<input class="input" name="wa" type="tel" inputmode="tel" required placeholder="Ej: 3764 123456" autocomplete="off"></label>
     <label class="field">Dirección<input class="input" name="dir" required placeholder="Calle, número y barrio" autocomplete="off"></label>
+    <div class="xf"><label class="field">DNI (opcional)<input class="input" name="dni" inputmode="numeric" placeholder="Solo números" autocomplete="off"></label>
+    <label class="field">Mail (opcional)<input class="input" name="email" type="email" autocomplete="off"></label>
+    <label class="field">Fecha de nacimiento (opcional)<input class="input" type="date" name="nac"></label>
+    <label class="field">Teléfono de emergencia (opcional)<input class="input" name="emer" type="tel" inputmode="tel" autocomplete="off"></label></div>
     <label class="field">Plan<select class="select" name="plan" required></select></label>
     <label class="field">Vencimiento de la cuota actual<input class="input" type="date" name="vence" required></label>
     <label class="field">Notas (opcional)<textarea class="input" name="notas" rows="2" placeholder="Lesiones, objetivos, observaciones"></textarea></label>
@@ -459,9 +463,9 @@ img.lgl{display:none}
 <dialog class="dlg dlg-wide" id="dlgImp" aria-labelledby="dlgImpT">
   <form id="fImp">
     <h2 class="title h2" id="dlgImpT">Importar alumnos</h2>
-    <p class="sub2">Copiá la lista desde Excel o Google Sheets y pegala acá, o subí un archivo CSV. Columnas: Nombre, Teléfono, Dirección, Plan, Vencimiento y Notas (solo el nombre es obligatorio). Si no hay vencimiento se usa la fecha de hoy.</p>
+    <p class="sub2">Copiá la lista desde Excel o Google Sheets (con la fila de títulos) y pegala acá, o subí un archivo CSV. Reconoce Nombre, Teléfono, Dirección, DNI, Mail, Fecha de nacimiento, Teléfono de emergencia, Plan, Vencimiento y Notas. Solo el nombre es obligatorio. Los que ya existen no se duplican: se les completan los datos que falten.</p>
     <textarea class="input" name="txt" rows="5" spellcheck="false" placeholder="Pegá acá las filas..."></textarea>
-    <div class="two"><label class="btn" for="impFile" style="cursor:pointer">Subir archivo CSV</label><a class="btn" download="modelo_alumnos.csv" href="data:text/csv;charset=utf-8,%EF%BB%BFNombre%3BTel%C3%A9fono%3BDirecci%C3%B3n%3BPlan%3BVencimiento%3BNotas%0AJuan%20P%C3%A9rez%3B3764123456%3BBol%C3%ADvar%201234%3B2%20veces%20por%20semana%3B30/11/2026%3B%0AMar%C3%ADa%20G%C3%B3mez%3B3764654321%3BSan%20Mart%C3%ADn%2055%3BPlan%20libre%3B15/12/2026%3BLesi%C3%B3n%20de%20rodilla%0A">Descargar modelo</a></div>
+    <div class="two"><label class="btn" for="impFile" style="cursor:pointer">Subir archivo CSV</label><a class="btn" download="modelo_alumnos.csv" href="data:text/csv;charset=utf-8,%EF%BB%BFNombre%3BTel%C3%A9fono%3BDirecci%C3%B3n%3BDNI%3BMail%3BFecha%20de%20nacimiento%3BTel%C3%A9fono%20de%20emergencia%3BPlan%3BVencimiento%3BNotas%0AJuan%20P%C3%A9rez%3B3764123456%3BBol%C3%ADvar%201234%3B30123456%3Bjuan%40mail.com%3B15/03/1995%3B3764654321%3B2%20veces%20por%20semana%3B30/11/2026%3B%0AMar%C3%ADa%20G%C3%B3mez%3B3764654321%3BSan%20Mart%C3%ADn%2055%3B32456789%3Bmaria%40mail.com%3B02/09/1990%3B3764111222%3BPlan%20libre%3B15/12/2026%3BLesi%C3%B3n%20de%20rodilla%0A">Descargar modelo</a></div>
     <input type="file" id="impFile" accept=".csv,.tsv,.txt,text/csv,text/plain,text/tab-separated-values" hidden>
     <label class="field">Plan para los alumnos que no lo traen<select class="select" name="planDef"></select></label>
     <div id="impPrev" aria-live="polite"></div>
@@ -545,9 +549,14 @@ function planOf(a){return PLANES[a.plan]||{n:'Sin plan',p:0,m:1};}
 var alumnos=[], pagos=[], ULT={};
 function rebuildOrd(){PLAN_ORD=Object.keys(PLANES).filter(function(k){return PLANES[k].act;}).sort(function(a,b){return PLANES[a].p-PLANES[b].p;});}
 function mapPlan(p){return {n:p.nombre,p:+p.precio,m:+p.meses,act:p.activo!==false};}
-function mapAl(x){return {id:x.id,nombre:x.nombre,wa:x.whatsapp||'',dir:x.direccion||'',notas:x.notas||'',plan:x.plan_id,vence:x.vence?pd(x.vence):hoy,alta:pd(x.fecha_alta)};}
+var EXTRA=true,COLS_BASE='id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta',COLS_EXTRA=',dni,email,fecha_nac,tel_emergencia';
+function colsAl(){return COLS_BASE+(EXTRA?COLS_EXTRA:'');}
+function mapAl(x){return {id:x.id,nombre:x.nombre,wa:x.whatsapp||'',dir:x.direccion||'',notas:x.notas||'',plan:x.plan_id,vence:x.vence?pd(x.vence):hoy,alta:pd(x.fecha_alta),dni:x.dni||'',email:x.email||'',nac:x.fecha_nac?pd(x.fecha_nac):null,emer:x.tel_emergencia||''};}
 function durTxt(m){return m===1?'1 mes':m+' meses';}
 function fmtNum(n){return Number(n).toLocaleString('es-AR',{maximumFractionDigits:2});}
+function fmtDni(d){return String(d).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function edadDe(d){var e=hoy.getFullYear()-d.getFullYear();if(hoy.getMonth()<d.getMonth()||(hoy.getMonth()===d.getMonth()&&hoy.getDate()<d.getDate()))e--;return e;}
+function telLinks(t){return String(t).split(' / ').map(function(x){var d=x.replace(/\D/g,'');if(d.length===10)d='549'+d;return '<a href="https://wa.me/'+d+'" target="_blank" rel="noopener">'+esc(x)+'</a>';}).join(' · ');}
 function waNum(a){var d=String(a.wa||'').replace(/\D/g,'');if(d.length===10)d='549'+d;return d;}
 
 var S={fichaId:null,F:null,AV:null,avF:'todos',edit:null,editPlan:null,view:'home',filtro:'todos',q:'',pagoId:null,plan:null,metodo:'transferencia',pagado:null,
@@ -639,7 +648,7 @@ function listaAlumnos(){
   var l=alumnos.filter(function(a){
     if(S.filtro!=='todos'&&estado(a)!==S.filtro)return false;
     if(!q)return true;
-    return a.nombre.toLowerCase().indexOf(q)>-1||a.dir.toLowerCase().indexOf(q)>-1||(qd&&a.wa.replace(/\D/g,'').indexOf(qd)>-1);
+    return a.nombre.toLowerCase().indexOf(q)>-1||a.dir.toLowerCase().indexOf(q)>-1||(qd&&a.wa.replace(/\D/g,'').indexOf(qd)>-1)||(qd&&a.dni&&a.dni.indexOf(qd)>-1)||(a.email&&a.email.indexOf(q)>-1);
   });
   if(!l.length)return '<div class="empty">'+(alumnos.length?'No hay alumnos con ese filtro.':'Todavía no cargaste alumnos. Tocá "Agregar alumno" para empezar.')+'</div>';
   return l.map(function(a){var p=planOf(a);
@@ -785,6 +794,10 @@ function fichaView(){
     '<section class="card dat">'+
       '<div class="r"><span>Teléfono</span><span>'+tel+'</span></div>'+
       '<div class="r"><span>Dirección</span><span>'+dir+'</span></div>'+
+      (a.dni?'<div class="r"><span>DNI</span><span>'+fmtDni(a.dni)+'</span></div>':'')+
+      (a.email?'<div class="r"><span>Mail</span><span><a href="mailto:'+esc(a.email)+'">'+esc(a.email)+'</a></span></div>':'')+
+      (a.nac?'<div class="r"><span>Nacimiento</span><span>'+dmy(a.nac)+' · '+edadDe(a.nac)+' años</span></div>':'')+
+      (a.emer?'<div class="r"><span>Emergencia</span><span>'+telLinks(a.emer)+'</span></div>':'')+
       '<div class="r"><span>Plan</span><span>'+esc(p.n)+' · '+money(p.p)+'</span></div>'+
       '<div class="r"><span>Cuota</span><span>'+venceTxt(a)+' &nbsp;'+badge(a)+'</span></div>'+
       '<div class="r"><span>Alumno desde</span><span>'+dmy(a.alta)+'</span></div>'+
@@ -861,12 +874,15 @@ function cargar(){
     S.recibo=(g.data[0].gyms.ultimo_recibo||0)+1;
     return Promise.all([
       db.from('planes').select('id,nombre,precio,meses,activo').order('precio'),
-      db.from('alumnos').select('id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta').eq('activo',true).order('nombre').limit(2000),
+      db.from('alumnos').select(colsAl()).eq('activo',true).order('nombre').limit(2000),
       db.from('pagos').select('alumno_id,plan_id,monto,metodo,fecha_pago,vence_hasta,recibo_nro').gte('fecha_pago',iso(ini1)).order('created_at'),
       db.from('asistencias').select('alumno_id,fecha').gte('fecha',iso(add(hoy,-14))),
       db.from('gym_members').select('nombre').limit(1),
       db.from('ejercicios').select('id,categoria,nombre,orden').eq('activo',true).order('orden').order('nombre')
     ]);
+  }).then(function(r){
+    if(r[1].error&&EXTRA){EXTRA=false;return db.from('alumnos').select(colsAl()).eq('activo',true).order('nombre').limit(2000).then(function(r1){r[1]=r1;return r;});}
+    return r;
   }).then(function(r){
     for(var i=0;i<4;i++)if(r[i].error)throw r[i].error;
     EJ=(!r[5].error&&r[5].data)||[];
@@ -915,7 +931,8 @@ function openAlumno(id){
   document.getElementById('dlgT').textContent=a?'Editar alumno':'Nuevo alumno';
   document.getElementById('btnAl').textContent=a?'Guardar':'Agregar';
   fillPlanSel(f.plan,a&&a.plan);
-  if(a){f.nombre.value=a.nombre;f.wa.value=a.wa;f.dir.value=a.dir;f.vence.value=iso(a.vence);f.notas.value=a.notas;}
+  document.querySelector('#fNuevo .xf').hidden=!EXTRA;
+  if(a){f.nombre.value=a.nombre;f.wa.value=a.wa;f.dir.value=a.dir;f.vence.value=iso(a.vence);f.notas.value=a.notas;f.dni.value=a.dni;f.email.value=a.email;f.nac.value=a.nac?iso(a.nac):'';f.emer.value=a.emer;}
   else f.vence.value=iso(hoy);
   document.getElementById('dlg').showModal();
 }
@@ -982,6 +999,11 @@ var ALIAS={
   nombre:['nombre','alumno','alumna','apellido y nombre','nombre y apellido','nombre completo','name','cliente'],
   wa:['telefono','tel','celular','whatsapp','wsp','cel','movil','phone','numero','nro'],
   dir:['direccion','domicilio','address','barrio','calle'],
+  dni:['dni','documento','nro de documento','numero de documento','d n i'],
+  email:['correo electronico','correo','email','e mail','mail'],
+  nac:['fecha de nacimiento','nacimiento','fecha nacimiento','fecha nac','cumpleanos','nac'],
+  emer:['telefono de emergencia','tel de emergencia','tel emergencia','telefono emergencia','contacto de emergencia','emergencia'],
+  postre:['postre favorito','postre'],
   plan:['plan','abono','cuota'],
   vence:['vencimiento','vence','fecha de vencimiento','proximo vencimiento','vto','fecha vencimiento'],
   notas:['notas','nota','observaciones','comentarios','obs']
@@ -992,6 +1014,32 @@ function mapColumnas(rows){
   if(hit>=1&&map.nombre!==undefined)return {map:map,header:true};
   if(hit>=2)return {map:Object.assign({nombre:0},map),header:true};
   return {map:{nombre:0,wa:1,dir:2,plan:3,vence:4,notas:5},header:false};
+}
+/* limpieza de datos que vienen de formularios */
+var PART=['de','la','del','las','los','da','di','do','y','van','von','e'];
+function titulo(s){
+  var w=s.split(' '),mal=w.some(function(x){var u=x.toUpperCase(),l=x.toLowerCase();return x.length>=3&&((x===u&&x!==l)||(x.charAt(0)===l.charAt(0)&&x.charAt(0)!==u.charAt(0)&&PART.indexOf(l)<0));});
+  if(!mal)return s;
+  return w.map(function(x,i){var l=x.toLowerCase();return(i>0&&PART.indexOf(l)>=0)?l:l.charAt(0).toUpperCase()+l.slice(1);}).join(' ');
+}
+function nameKey(n){return nrm(n).split(' ').sort().join(' ');}
+function normTel(s){
+  s=String(s==null?'':s).trim().replace(/^'/,'');if(!s)return '';
+  s=s.replace(/^(\d+)\.0+$/,'$1');
+  if(/^(\s*\d{10}\s*){2,}$/.test(s))return s.trim().split(/\s+/).join(' / ');
+  var d=s.replace(/\D/g,'');
+  if(d.indexOf('00')===0)d=d.slice(2);
+  if(d.length===13&&d.indexOf('549')===0)d=d.slice(3);
+  else if(d.length===12&&d.indexOf('54')===0)d=d.slice(2);
+  if(d.length===11&&d.charAt(0)==='0')d=d.slice(1);
+  if(d.length>=11)return '+'+d;
+  return d;
+}
+function normDni(s){s=String(s==null?'':s).trim().replace(/^(\d+)\.0+$/,'$1');return s.replace(/\D/g,'');}
+function normEmail(s){
+  s=String(s==null?'':s).trim().toLowerCase().replace(/\s+/g,'');if(!s)return '';
+  s=s.replace(/@(gmail|hotmail|outlook|yahoo|live|icloud)com$/,'@$1.com');
+  return /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(s)?s:null;
 }
 function parseFecha(s){
   s=String(s||'').trim();if(!s)return null;
@@ -1007,40 +1055,83 @@ function buscarPlan(txt){
   for(i=0;i<ids.length;i++){var n=nrm(PLANES[ids[i]].n);if(n.indexOf(t)>=0||t.indexOf(n)>=0)return ids[i];}
   return null;
 }
+var ETQ={dni:'DNI',email:'mail',fecha_nac:'nacimiento',tel_emergencia:'emergencia',whatsapp:'teléfono',direccion:'dirección',notas:'notas'};
+function parchear(ex,o){
+  var p={},n=0;
+  if(!ex.dni&&o.dni){p.dni=o.dni;n++;}
+  if(!ex.email&&o.email){p.email=o.email;n++;}
+  if(!ex.nac&&o.nac){p.fecha_nac=iso(o.nac);n++;}
+  if(!ex.emer&&o.emer){p.tel_emergencia=o.emer;n++;}
+  if(!ex.wa&&o.wa){p.whatsapp=o.wa;n++;}
+  if(!ex.dir&&o.dir){p.direccion=o.dir;n++;}
+  if(!ex.notas&&o.notas){p.notas=o.notas;n++;}
+  return n?p:null;
+}
 function armarImport(){
   var f=document.getElementById('fImp'),txt=f.txt.value,prev=document.getElementById('impPrev'),btn=document.getElementById('btnImp');
   S.imp=[];
   if(!txt.trim()){prev.innerHTML='';btn.disabled=true;btn.textContent='Importar';return;}
   var rows=parseTabla(txt);if(!rows.length){prev.innerHTML='';btn.disabled=true;return;}
   var cm=mapColumnas(rows),data=cm.header?rows.slice(1):rows;
-  var vistos={},tels={};
-  alumnos.forEach(function(a){vistos[nrm(a.nombre)]=1;var d=String(a.wa).replace(/\D/g,'');if(d.length>=6)tels[d]=1;});
+  var exDni={},exNom={},tels={};
+  alumnos.forEach(function(a){if(a.dni)exDni[a.dni]=a;exNom[nameKey(a.nombre)]=a;var d=String(a.wa).replace(/\D/g,'');if(d.length>=6&&!tels[d])tels[d]=a;});
   var def=f.planDef.value||null,hoyIso=iso(hoy);
   var out=data.map(function(r){
     var g=function(k){return cm.map[k]===undefined?'':String(r[cm.map[k]]==null?'':r[cm.map[k]]).trim();};
-    var nombre=g('nombre').replace(/\s+/g,' ').slice(0,120),wa=g('wa').replace(/^'/,'').slice(0,40),dig=wa.replace(/\D/g,'');
-    var o={nombre:nombre,wa:wa,dir:g('dir').slice(0,200),notas:g('notas').slice(0,500),st:'ok',msg:''};
+    var msgs=[];
+    var nombre=titulo(g('nombre').replace(/\s+/g,' ').trim()).slice(0,120),wa=normTel(g('wa')).slice(0,40);
+    var o={nombre:nombre,wa:wa,dir:g('dir').replace(/\s+/g,' ').slice(0,200),st:'ok',msg:''};
+    if(wa&&wa.charAt(0)!=='+'&&wa.replace(/\D/g,'').length!==10)msgs.push('Teléfono con formato raro');
+    var rawDni=g('dni'),dni=normDni(rawDni);
+    if(rawDni&&(dni.length<7||dni.length>9)){msgs.push('DNI no válido ("'+rawDni+'"): se omite');dni='';}
+    o.dni=dni;
+    var em=normEmail(g('email'));if(em===null){msgs.push('Mail no válido: se omite');em='';}
+    o.email=em;
+    var nt=g('nac'),nd=nt?parseFecha(nt):null;
+    if(nt){var ed=nd?(hoy-nd)/(365.25*DAY):-1;if(!nd||ed<3||ed>100){msgs.push('Fecha de nacimiento dudosa ('+nt+'): se omite');nd=null;}}
+    o.nac=nd;
+    o.emer=normTel(g('emer')).slice(0,80);
+    var po=g('postre');
+    o.notas=[g('notas'),po?'Postre favorito: '+po:''].filter(Boolean).join(' · ').slice(0,500);
     var pt=g('plan'),pid=pt?buscarPlan(pt):null;
-    if(pt&&!pid)o.msg='Plan "'+pt+'" no existe: usa el plan por defecto';
+    if(pt&&!pid)msgs.push('Plan "'+pt+'" no existe: usa el plan por defecto');
     o.plan=pid||def;
     var ft=g('vence'),fd=parseFecha(ft);
-    if(ft&&!fd)o.msg=(o.msg?o.msg+' · ':'')+'Fecha no válida: usa hoy';
+    if(ft&&!fd)msgs.push('Fecha no válida: usa hoy');
     o.vence=fd?iso(fd):hoyIso;
-    var key=nrm(nombre);
-    if(!nombre){o.st='err';o.msg='Sin nombre';}
-    else if(vistos[key]){o.st='dup';o.msg='Ya existe un alumno con ese nombre';}
-    else if(dig.length>=6&&tels[dig]){o.st='dup';o.msg='Ya existe un alumno con ese teléfono';}
-    else{vistos[key]=1;if(dig.length>=6)tels[dig]=1;}
+    o.msg=msgs.join(' · ');
     return o;
   });
+  var lastDni={},vistos={};
+  out.forEach(function(o,i){if(o.dni)lastDni[o.dni]=i;});
+  out.forEach(function(o,i){
+    if(!o.nombre){o.st='err';o.msg='Sin nombre';return;}
+    if(o.dni&&lastDni[o.dni]!==i){o.st='dup';o.msg='Repetido en el archivo: se usa la respuesta más nueva';return;}
+    var ex=null,nk=nameKey(o.nombre);
+    if(o.dni&&exDni[o.dni])ex=exDni[o.dni];
+    else if(exNom[nk]&&(!exNom[nk].dni||!o.dni))ex=exNom[nk];
+    if(ex){
+      var pa=EXTRA?parchear(ex,o):null;
+      if(pa){o.st='upd';o.ex=ex;o.patch=pa;o.msg='Ya existe: completa '+Object.keys(pa).map(function(k){return ETQ[k];}).join(', ');}
+      else{o.st='dup';o.msg='Ya existe en el sistema';}
+      return;
+    }
+    var d=o.wa.replace(/\D/g,'');
+    if(vistos[nk]&&(!vistos[nk].dni||!o.dni)){o.st='dup';o.msg='Repetido en el archivo';return;}
+    if(!o.dni&&d.length>=6&&tels[d]){o.st='dup';o.msg='Ya existe un alumno con ese teléfono';return;}
+    vistos[nk]=o;if(d.length>=6&&!tels[d])tels[d]=o;
+  });
   S.imp=out;
-  var ok=out.filter(function(x){return x.st==='ok';}).length,dup=out.filter(function(x){return x.st==='dup';}).length,er=out.filter(function(x){return x.st==='err';}).length;
-  var ic={ok:'<span style="color:var(--ok)">&#10003;</span>',dup:'<span style="color:var(--warn)">&#9888;</span>',err:'<span style="color:var(--bad)">&#10007;</span>'};
-  prev.innerHTML='<div class="impsum"><b>'+ok+'</b> para importar'+(dup?' · <b>'+dup+'</b> repetidos (se omiten)':'')+(er?' · <b>'+er+'</b> sin nombre':'')+'</div>'+
-    '<div class="imptab" role="table"><div class="imph" role="row"><span></span><span>Nombre</span><span>Teléfono</span><span>Vence</span></div>'+
-    out.slice(0,200).map(function(x){return '<div class="impr'+(x.st!=='ok'?' x':'')+'" role="row" title="'+esc(x.msg)+'"><span>'+ic[x.st]+'</span><span class="n">'+esc(x.nombre||'—')+(x.msg?'<small>'+esc(x.msg)+'</small>':'')+'</span><span>'+esc(x.wa||'—')+'</span><span>'+dmy(pd(x.vence))+'</span></div>';}).join('')+
+  var ok=out.filter(function(x){return x.st==='ok';}).length,up=out.filter(function(x){return x.st==='upd';}).length,dup=out.filter(function(x){return x.st==='dup';}).length,er=out.filter(function(x){return x.st==='err';}).length;
+  var ic={ok:'<span style="color:var(--ok)">&#10003;</span>',upd:'<span style="color:var(--ort)">&#8635;</span>',dup:'<span style="color:var(--warn)">&#9888;</span>',err:'<span style="color:var(--bad)">&#10007;</span>'};
+  var c4=cm.map.vence!==undefined;
+  prev.innerHTML='<div class="impsum"><b>'+ok+'</b> nuevos'+(up?' · <b>'+up+'</b> a completar':'')+(dup?' · <b>'+dup+'</b> repetidos (se omiten)':'')+(er?' · <b>'+er+'</b> sin nombre':'')+'</div>'+
+    (EXTRA?'':'<div class="sub2" style="margin:6px 0">Falta ejecutar el último patch SQL: DNI, mail, nacimiento y emergencia se guardan dentro de Notas.</div>')+
+    '<div class="imptab" role="table"><div class="imph" role="row"><span></span><span>Nombre</span><span>Teléfono</span><span>'+(c4?'Vence':'DNI')+'</span></div>'+
+    out.slice(0,200).map(function(x){return '<div class="impr'+((x.st==='dup'||x.st==='err')?' x':'')+'" role="row" title="'+esc(x.msg)+'"><span>'+ic[x.st]+'</span><span class="n">'+esc(x.nombre||'—')+(x.msg?'<small>'+esc(x.msg)+'</small>':'')+'</span><span>'+esc(x.wa||'—')+'</span><span>'+(c4?dmy(pd(x.vence)):esc(x.dni||'—'))+'</span></div>';}).join('')+
     (out.length>200?'<div class="impr"><span></span><span class="n"><small>y '+(out.length-200)+' más…</small></span></div>':'')+'</div>';
-  btn.disabled=!ok;btn.textContent=ok?('Importar '+ok+(ok===1?' alumno':' alumnos')):'Nada para importar';
+  var tot=ok+up;
+  btn.disabled=!tot;btn.textContent=tot?('Importar '+(ok?ok+(ok===1?' nuevo':' nuevos'):'')+(ok&&up?' y ':'')+(up?'completar '+up:'')):'Nada para importar';
 }
 function openImport(){
   if(!PLAN_ORD.length){toast('Primero creá al menos un plan.');go('planes');return;}
@@ -1062,27 +1153,49 @@ function leerArchivoImport(file){
   fr.onerror=function(){toast('No se pudo leer el archivo.');};
   fr.readAsArrayBuffer(file);
 }
+function payloadAl(x){
+  var p={gym_id:GYM.id,nombre:x.nombre,whatsapp:x.wa||null,direccion:x.dir||null,plan_id:x.plan||null,vence:x.vence,notas:x.notas||null};
+  if(EXTRA){p.dni=x.dni||null;p.email=x.email||null;p.fecha_nac=x.nac?iso(x.nac):null;p.tel_emergencia=x.emer||null;}
+  else{
+    var ex=[x.dni&&'DNI: '+x.dni,x.email&&'Mail: '+x.email,x.nac&&'Nacimiento: '+dmy(x.nac),x.emer&&'Emergencia: '+x.emer].filter(Boolean);
+    if(ex.length)p.notas=[x.notas].concat(ex).filter(Boolean).join(' · ').slice(0,500);
+  }
+  return p;
+}
 document.getElementById('fImp').addEventListener('submit',function(e){
   e.preventDefault();if(S.busy)return;
-  var ok=(S.imp||[]).filter(function(x){return x.st==='ok';});if(!ok.length)return;
-  var f=e.target,btn=document.getElementById('btnImp');
+  var imp=S.imp||[],ok=imp.filter(function(x){return x.st==='ok';}),up=imp.filter(function(x){return x.st==='upd';});
+  if(!ok.length&&!up.length)return;
+  var btn=document.getElementById('btnImp');
   S.busy=true;btn.disabled=true;btn.textContent='Importando...';
-  var cols='id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta',hechos=0,lotes=[];
+  var cols=colsAl(),hechos=0,actual=0,lotes=[];
   for(var i=0;i<ok.length;i+=100)lotes.push(ok.slice(i,i+100));
+  function ordenar(){alumnos.sort(function(p,q2){return p.nombre.localeCompare(q2.nombre,'es');});}
+  function fallo(r){
+    S.busy=false;
+    if(hechos||actual){ordenar();S.F=null;render();}
+    armarImport();btn.textContent='Reintentar';
+    fail(r,'Se importaron '+hechos+(actual?' y se completaron '+actual:'')+', falló el resto');
+  }
+  function fin(){
+    S.busy=false;ordenar();
+    document.getElementById('dlgImp').close();S.F=null;S.filtro='todos';S.q='';
+    var t=[];if(hechos)t.push(hechos+(hechos===1?' alumno nuevo':' alumnos nuevos'));if(actual)t.push(actual+(actual===1?' ficha completada':' fichas completadas'));
+    toast(t.join(' · '),true);
+    if(S.view!=='alumnos')go('alumnos');else render();
+  }
+  function actualizar(ix){
+    if(ix>=up.length)return fin();
+    var x=up[ix];
+    db.from('alumnos').update(x.patch).eq('id',x.ex.id).select(cols).single().then(function(r){
+      if(r.error)return fallo(r);
+      var nx=mapAl(r.data);alumnos=alumnos.map(function(o){return o.id===nx.id?nx:o;});actual++;actualizar(ix+1);
+    });
+  }
   (function sig(ix){
-    if(ix>=lotes.length){
-      S.busy=false;alumnos.sort(function(p,q2){return p.nombre.localeCompare(q2.nombre,'es');});
-      document.getElementById('dlgImp').close();S.F=null;S.filtro='todos';S.q='';
-      toast(hechos+(hechos===1?' alumno importado':' alumnos importados'),true);
-      if(S.view!=='alumnos')go('alumnos');else render();return;
-    }
-    var payload=lotes[ix].map(function(x){return {gym_id:GYM.id,nombre:x.nombre,whatsapp:x.wa||null,direccion:x.dir||null,plan_id:x.plan||null,vence:x.vence,notas:x.notas||null};});
-    db.from('alumnos').insert(payload).select(cols).then(function(r){
-      if(r.error){
-        S.busy=false;btn.disabled=false;btn.textContent='Reintentar';
-        if(hechos){alumnos.sort(function(p,q2){return p.nombre.localeCompare(q2.nombre,'es');});S.F=null;render();}
-        fail(r,'Se importaron '+hechos+' y falló el resto');return;
-      }
+    if(ix>=lotes.length)return actualizar(0);
+    db.from('alumnos').insert(lotes[ix].map(payloadAl)).select(cols).then(function(r){
+      if(r.error)return fallo(r);
       r.data.forEach(function(x){alumnos.push(mapAl(x));});hechos+=r.data.length;sig(ix+1);
     });
   })(0);
@@ -1575,11 +1688,18 @@ document.getElementById('fNuevo').addEventListener('submit',function(e){
   e.preventDefault();
   var f=e.target, nombre=f.nombre.value.trim();if(!nombre||S.busy)return;
   var d={nombre:nombre,whatsapp:f.wa.value.trim(),direccion:f.dir.value.trim(),plan_id:f.plan.value||null,vence:f.vence.value||null,notas:f.notas.value.trim()||null};
-  var cols='id,nombre,whatsapp,direccion,notas,plan_id,vence,fecha_alta', edit=S.edit;
+  var cols=colsAl(), edit=S.edit;
+  if(EXTRA){
+    var dn=f.dni.value.replace(/\D/g,''),em=f.email.value.trim().toLowerCase();
+    if(dn&&(dn.length<7||dn.length>9)){toast('El DNI debe tener entre 7 y 9 números.');return;}
+    if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)){toast('El mail no parece válido.');return;}
+    d.dni=dn||null;d.email=em||null;d.fecha_nac=f.nac.value||null;d.tel_emergencia=f.emer.value.trim()||null;
+  }
   S.busy=true;
   var q=edit?db.from('alumnos').update(d).eq('id',edit):db.from('alumnos').insert(Object.assign({gym_id:GYM.id},d));
   q.select(cols).single().then(function(r){
     S.busy=false;
+    if(r.error&&r.error.code==='23505'){toast('Ya existe un alumno con ese DNI.');return;}
     if(fail(r,edit?'No se pudo guardar':'No se pudo agregar el alumno'))return;
     var x=mapAl(r.data);
     if(edit){alumnos=alumnos.map(function(o){return o.id===edit?x:o;});}else alumnos.push(x);
