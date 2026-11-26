@@ -437,7 +437,7 @@ img.lgl{display:none}
     </form>
 
     <div class="pst" id="pNoGym" hidden>
-      <h1>Link incompleto</h1><p>Pedile a tu profe el link del portal para poder crear tu cuenta.</p>
+      <h1>¿Todavía no tenés cuenta?</h1><p>Para crear tu cuenta usá el link completo que te pasó tu profe. Si ya tenés cuenta, entrá con tu mail y contraseña.</p>
     </div>
   </div>
 </section>
@@ -521,7 +521,13 @@ function setMode(m){
   ['login','signup','forgot','reset'].forEach(function(k){var f=$('f'+k.charAt(0).toUpperCase()+k.slice(1));if(f)f.hidden=k!==m;});
   $err.textContent='';
 }
-function mostrarLogin(m){show('login');$msg.textContent='';setMode(m||'login');if(!SLUG){['fLogin','fSignup','fForgot','fReset'].forEach(function(i){$(i).hidden=true;});$('pNoGym').hidden=false;}}
+function mostrarLogin(m){
+  show('login');$msg.textContent='';
+  if(!SLUG&&m==='signup')m='login';
+  setMode(m||'login');
+  var sl=document.querySelector('#fLogin [data-k=signup]');if(sl)sl.hidden=!SLUG;
+  $('pNoGym').hidden=!!SLUG||m==='reset';
+}
 function estadoUI(w,txt){
   show('estado');['pPend','pRech','pErr'].forEach(function(i){$(i).hidden=true;});
   $(w).hidden=false;if(txt)$('eMsg').textContent=txt;$('eGym').textContent=GYMN;
