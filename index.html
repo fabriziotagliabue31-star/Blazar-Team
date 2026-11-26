@@ -351,6 +351,15 @@ img.lgl{display:none}
 .fpad-wrap{position:relative}
 .fpad-hint{position:absolute;left:0;right:0;bottom:34px;text-align:center;color:#9aa0a6;font-size:13px;pointer-events:none}
 .fpad-line{position:absolute;left:6%;right:6%;bottom:56px;border-top:1px solid #d5d8dc;pointer-events:none}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--or);color:#0A0A0A;font-size:12px;font-weight:700;margin-left:6px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.pchip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:10px;background:var(--orsoft);color:var(--ort)}.pchip.off{background:var(--hov);color:var(--mut)}
+.perms{display:flex;flex-direction:column;gap:8px}
+.chk{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer}.chk input{width:20px;height:20px;margin-top:2px;accent-color:var(--or);flex:none}.chk b{display:block;font-size:14px}.chk small{display:block;color:var(--mut);font-size:12px}
+.linkbox{padding:12px 14px;border:1px dashed var(--line2);border-radius:12px;font-size:13px;overflow-wrap:anywhere;background:var(--bg2)}
+.cta{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--line)}.cta small{display:block;color:var(--mut);font-size:12px}
+.plist{margin:10px 0 0;padding-left:18px;color:var(--mut);font-size:13px;display:grid;gap:4px}
+.line .a2{display:flex;gap:8px;flex:none}
+.nav .who:disabled{cursor:default}.nav .who:disabled:hover{background:none}
 .firma-img{display:block;max-height:90px;max-width:100%;object-fit:contain}
 </style>
 </head>
@@ -445,6 +454,35 @@ img.lgl{display:none}
       <button type="submit" class="btn primary" id="btnAl">Agregar</button>
     </div>
   </form>
+</dialog>
+
+<dialog class="dlg" id="dlgEq" aria-labelledby="dlgEqT">
+  <form id="fEq">
+    <h2 class="title h2" id="dlgEqT">Invitar al equipo</h2>
+    <p class="sub2" id="eqHelp">Escribí el mail de la persona. Cuando cree su cuenta con ese mismo mail y lo confirme, entra con los permisos que elijas acá.</p>
+    <label class="field">Mail<input class="input" name="email" type="email" required maxlength="160" autocomplete="off"></label>
+    <label class="field">Nombre<input class="input" name="nombre" maxlength="40" placeholder="Cómo la saludamos" autocomplete="off"></label>
+    <div class="perms">
+      <label class="chk"><input type="checkbox" name="p_alumnos"><span><b>Alumnos</b><small>Ver y editar alumnos, importar listas y aprobar cuentas del portal</small></span></label>
+      <label class="chk"><input type="checkbox" name="p_asistencia"><span><b>Asistencia</b><small>Tomar la asistencia</small></span></label>
+      <label class="chk"><input type="checkbox" name="p_avances"><span><b>Avances</b><small>Cargar marcas y logros de los alumnos</small></span></label>
+      <label class="chk"><input type="checkbox" name="p_cobros"><span><b>Cobros</b><small>Cobrar cuotas, ver pagos e ingresos</small></span></label>
+      <label class="chk"><input type="checkbox" name="p_contenido"><span><b>Contenido</b><small>Cargar noticias y eventos del portal de alumnos</small></span></label>
+    </div>
+    <div class="acts">
+      <button type="button" class="btn" data-a="cerrar" data-k="dlgEq">Cancelar</button>
+      <button type="submit" class="btn primary" id="btnEq">Enviar invitación</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg dlg-wide" id="dlgCuentas" aria-labelledby="dlgCuentasT">
+  <div class="stack">
+    <h2 class="title h2" id="dlgCuentasT">Cuentas de alumnos</h2>
+    <p class="sub2">Las cuentas cuyo mail coincide con el de una ficha se vinculan solas. Las demás quedan acá esperando que las apruebes.</p>
+    <div id="cuentasBody"></div>
+    <div class="acts"><button type="button" class="btn" data-a="cerrar" data-k="dlgCuentas">Cerrar</button></div>
+  </div>
 </dialog>
 
 <dialog class="dlg dlg-wide" id="dlgFirma" aria-labelledby="dlgFirmaT">
@@ -563,6 +601,11 @@ var S={fichaId:null,F:null,AV:null,avF:'todos',edit:null,editPlan:null,view:'hom
   pres:new Set(),paso:'antes',avisoId:null,recibo:1,busy:false,cargado:false};
 
 var TITLES={home:'Tablero',alumnos:'Alumnos',alumno:'Ficha del alumno',pago:'Cobrar',asistencia:'Asistencia',progreso:'Progreso',planes:'Planes',avisos:'Avisos (Fase 2)',ajustes:'Configuración'};
+var ROL='admin',PERM=null;
+function isAdmin(){return ROL==='admin';}
+function can(p){return ROL==='admin'||!PERM||PERM[p]===true;}
+var NEED={pago:'cobros',avisos:'cobros',asistencia:'asistencia',progreso:'avances',planes:'#admin',ajustes:'#admin'};
+function allowed(v){var n=NEED[v];if(!n)return true;if(n==='#admin')return isAdmin();return can(n);}
 var CATS={
   dinamico:{n:'Dinámicos',tipo:'logro',u:null,hint:'Se registra cuando el alumno consigue el movimiento.'},
   estatico:{n:'Estáticos',tipo:'marca',u:'seg',lbl:'Tiempo sostenido (segundos)',hint:'Se mide cuántos segundos sostiene la posición.'},
@@ -591,7 +634,7 @@ var BOLT='<svg width="18" height="26" viewBox="0 0 18 26" fill="#F47B20" aria-hi
 var CHECK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
 var TB='<button type="button" class="tbtn" data-a="tema" aria-label="Cambiar entre modo claro y oscuro" title="Modo claro / oscuro"><svg class="i-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>';
 var GEAR='<button type="button" class="tbtn tl" data-a="go" data-v="ajustes" aria-label="Configuración" title="Configuración"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>';
-function mlogo(){return '<div class="mlogo">'+GEAR+brandHTML('lg-m')+'<div class="tag">'+brandTag()+'</div>'+TB+'</div>';}
+function mlogo(){return '<div class="mlogo">'+(isAdmin()?GEAR:'<span class="tbtn tl" style="visibility:hidden" aria-hidden="true"></span>')+brandHTML('lg-m')+'<div class="tag">'+brandTag()+'</div>'+TB+'</div>';}
 function setTema(t){
   document.documentElement.setAttribute('data-theme',t);
   try{localStorage.setItem('tema',t);}catch(e){}
@@ -620,15 +663,15 @@ function home(){
   return mlogo()+head(hf,'Hola, '+esc(GYM.usuario||'profe'),'<button class="btn ghost sm" data-a="salir">Salir</button>')+
   (!PLAN_ORD.length?'<div class="hint"><b>Para empezar, creá tus planes de cuota (nombre, precio y duración).</b><button class="btn primary" data-a="go" data-v="planes">Crear planes</button></div>':'')+
   '<div class="g-home">'+
-    '<section class="card c-rev"><div class="eyebrow">Cobrado este mes</div><div class="big-num rev-num">'+money(cobrado)+'</div>'+
+    (!can('cobros')?miRolCard():'<section class="card c-rev"><div class="eyebrow">Cobrado este mes</div><div class="big-num rev-num">'+money(cobrado)+'</div>'+
       '<div class="bar" role="img" aria-label="'+pct+'% cobrado"><b style="width:'+pct+'%"></b></div>'+
-      '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px;color:var(--mut)"><span>'+pct+'% de lo esperado</span><span>Pendiente <b style="color:var(--tx);font-weight:600">'+money(pend)+'</b></span></div></section>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px;color:var(--mut)"><span>'+pct+'% de lo esperado</span><span>Pendiente <b style="color:var(--tx);font-weight:600">'+money(pend)+'</b></span></div></section>')+
     '<section class="kpis c-kpi" aria-label="Resumen">'+
       '<div class="kpi" style="--k:#4ADE80"><div class="big-num">'+alumnos.length+'</div><span>Alumnos activos</span></div>'+
       '<div class="kpi" style="--k:#FACC15"><div class="big-num">'+n.por+'</div><span>Vencen esta semana</span></div>'+
       '<div class="kpi" style="--k:#FF6B5E"><div class="big-num">'+n.venc+'</div><span>Con cuota vencida</span></div></section>'+
-    '<section class="c-cob"><div class="sec"><h2 class="title h2">Para cobrar hoy</h2><button class="link" data-a="go" data-v="alumnos">Ver todos</button></div>'+listaCob+'</section>'+
-    '<section class="c-act"><div class="sec"><h2 class="title h2">Últimos pagos</h2></div>'+listaAct+'</section>'+
+    (can('cobros')?'<section class="c-cob"><div class="sec"><h2 class="title h2">Para cobrar hoy</h2><button class="link" data-a="go" data-v="alumnos">Ver todos</button></div>'+listaCob+'</section>':'')+
+    (can('cobros')?'<section class="c-act"><div class="sec"><h2 class="title h2">Últimos pagos</h2></div>'+listaAct+'</section>':'')+
   '</div>';
 }
 
@@ -638,7 +681,8 @@ function alumnosView(){
     return '<button class="chip'+(S.filtro===c[0]?' on':'')+'" data-a="filtro" data-k="'+c[0]+'">'+c[1]+' · '+cnt+'</button>';}).join('');
   var add='<button class="btn primary" data-a="nuevo" aria-label="Agregar alumno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Agregar<span class="lbl2"> alumno</span></span></button>';
   var imp='<button class="btn iconm" data-a="importar" aria-label="Importar alumnos"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="lbl">Importar</span></button>';
-  return mlogo()+head(esc(GYM.nombre),'Alumnos','<div class="hbtns">'+imp+add+'</div>')+
+  var cta=can('alumnos')?'<button class="btn iconm" data-a="cuentas" aria-label="Cuentas de alumnos"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="m16 11 2 2 4-4"/></svg><span class="lbl">Cuentas</span>'+(S.pend>0?'<span class="cnt">'+S.pend+'</span>':'')+'</button>':'';
+  return mlogo()+head(esc(GYM.nombre),'Alumnos','<div class="hbtns">'+cta+(can('alumnos')?imp+add:'')+'</div>')+
   '<div class="tools"><label class="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A9A9A" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="text" aria-label="Buscar alumno" placeholder="Buscar por nombre, teléfono o dirección" value="'+esc(S.q)+'" autocomplete="off"></label><div class="chips">'+chips+'</div></div>'+
   '<div class="rh" aria-hidden="true"><span></span><span>Alumno</span><span>Plan</span><span>Vencimiento</span><span>Monto</span><span>Estado</span></div>'+
   '<div class="rows" id="lista">'+listaAlumnos()+'</div>';
@@ -803,9 +847,9 @@ function fichaView(){
       '<div class="r"><span>Alumno desde</span><span>'+dmy(a.alta)+'</span></div>'+
       (a.notas?'<div class="r"><span>Notas</span><span>'+esc(a.notas)+'</span></div>':'')+
     '</section>'+
-    '<div class="acts3"><button class="btn primary" data-a="cobrar" data-id="'+a.id+'">Cobrar cuota</button><button class="btn ghost" data-a="nuevoav" data-id="'+a.id+'">Registrar avance</button><button class="btn" data-a="editar" data-id="'+a.id+'">Editar datos</button><button class="btn danger" data-a="baja" data-id="'+a.id+'">Dar de baja</button></div>'+
-    '<section><div class="sec"><h2 class="title h2">Últimos pagos</h2></div>'+pgs+'</section>'+
-  '</div><section><div class="sec"><h2 class="title h2">Progreso</h2><span class="muted" style="font-size:13px">'+nl+' logros · '+nm+' marcas</span></div>'+recs(F.avances)+evolucion(F.avances,a.id)+avs+'</section></div>';
+    '<div class="acts3">'+(can('cobros')?'<button class="btn primary" data-a="cobrar" data-id="'+a.id+'">Cobrar cuota</button>':'')+(can('avances')?'<button class="btn ghost" data-a="nuevoav" data-id="'+a.id+'">Registrar avance</button>':'')+(can('alumnos')?'<button class="btn" data-a="editar" data-id="'+a.id+'">Editar datos</button><button class="btn danger" data-a="baja" data-id="'+a.id+'">Dar de baja</button>':'')+'</div>'+
+    (can('cobros')?'<section><div class="sec"><h2 class="title h2">Últimos pagos</h2></div>'+pgs+'</section>':'')+
+  '</div>'+(can('avances')?'<section><div class="sec"><h2 class="title h2">Progreso</h2><span class="muted" style="font-size:13px">'+nl+' logros · '+nm+' marcas</span></div>'+recs(F.avances)+evolucion(F.avances,a.id)+avs+'</section>':'')+'</div>';
 }
 
 function progresoView(){
@@ -853,8 +897,9 @@ function render(){
   document.title=GYM.nombre+' · '+TITLES[S.view];
   fillShell();
 }
-function fromHash(){var v=(location.hash||'').replace('#/','');if(v==='alumno'&&!byId(S.fichaId))return 'alumnos';return VIEWS[v]?v:'home';}
+function fromHash(){var v=(location.hash||'').replace('#/','');if(v==='alumno'&&!byId(S.fichaId))return 'alumnos';return VIEWS[v]&&allowed(v)?v:'home';}
 function go(v){
+  if(!allowed(v))v='home';
   if(location.hash==='#/'+v){S.view=v;if(v!=='pago')S.pagado=null;render();window.scrollTo(0,0);}
   else location.hash='#/'+v;
 }
@@ -866,27 +911,30 @@ function fail(r,msg){if(r&&r.error){console.error(r.error);toast((msg||'No se pu
 function cargar(){
   var ini1=new Date(hoy.getFullYear(),hoy.getMonth(),1);
   var NIV=['nombre,ultimo_recibo,logo,telefono,direccion,leyenda,razon_social,cuit,cond_iva,pto_venta,firma,firmante','nombre,ultimo_recibo,logo,telefono,direccion,leyenda,razon_social,cuit,cond_iva,pto_venta','nombre,ultimo_recibo,logo,telefono,direccion,leyenda','nombre,ultimo_recibo'];
-  function selGym(i){return db.from('gym_members').select('gym_id,gyms('+NIV[i]+')').limit(1);}
+  function selGym(i){return db.from('gym_members').select('gym_id,gyms('+NIV[i]+',slug)').limit(1);}
   return selGym(0).then(function(g){return g.error?selGym(1):g;}).then(function(g){return g.error?selGym(2):g;}).then(function(g){return g.error?selGym(3):g;}).then(function(g){
     if(g.error)throw g.error;
     if(!g.data||!g.data.length){var ne=new Error('sin gimnasio');ne.nogym=true;throw ne;}
-    var gy=g.data[0].gyms;GYM={id:g.data[0].gym_id,nombre:gy.nombre,logo:gy.logo||'',tel:gy.telefono||'',dir:gy.direccion||'',ley:gy.leyenda||'',rs:gy.razon_social||'',cuit:gy.cuit||'',iva:gy.cond_iva||'',pv:gy.pto_venta||1,firma:gy.firma||'',firmante:gy.firmante||''};
+    var gy=g.data[0].gyms;GYM={id:g.data[0].gym_id,nombre:gy.nombre,logo:gy.logo||'',tel:gy.telefono||'',dir:gy.direccion||'',ley:gy.leyenda||'',rs:gy.razon_social||'',cuit:gy.cuit||'',iva:gy.cond_iva||'',pv:gy.pto_venta||1,firma:gy.firma||'',firmante:gy.firmante||'',slug:gy.slug||''};
     S.recibo=(g.data[0].gyms.ultimo_recibo||0)+1;
     return Promise.all([
       db.from('planes').select('id,nombre,precio,meses,activo').order('precio'),
       db.from('alumnos').select(colsAl()).eq('activo',true).order('nombre').limit(2000),
       db.from('pagos').select('alumno_id,plan_id,monto,metodo,fecha_pago,vence_hasta,recibo_nro').gte('fecha_pago',iso(ini1)).order('created_at'),
       db.from('asistencias').select('alumno_id,fecha').gte('fecha',iso(add(hoy,-14))),
-      db.from('gym_members').select('nombre').limit(1),
+      db.from('gym_members').select('nombre,rol,permisos').limit(1),
       db.from('ejercicios').select('id,categoria,nombre,orden').eq('activo',true).order('orden').order('nombre')
     ]);
   }).then(function(r){
-    if(r[1].error&&EXTRA){EXTRA=false;return db.from('alumnos').select(colsAl()).eq('activo',true).order('nombre').limit(2000).then(function(r1){r[1]=r1;return r;});}
-    return r;
+    var fx=[];
+    if(r[1].error&&EXTRA){EXTRA=false;fx.push(db.from('alumnos').select(colsAl()).eq('activo',true).order('nombre').limit(2000).then(function(r1){r[1]=r1;}));}
+    if(r[4].error){fx.push(db.from('gym_members').select('nombre,rol').limit(1).then(function(r4){r[4]=r4;}));}
+    return Promise.all(fx).then(function(){return r;});
   }).then(function(r){
     for(var i=0;i<4;i++)if(r[i].error)throw r[i].error;
     EJ=(!r[5].error&&r[5].data)||[];
     GYM.usuario=(!r[4].error&&r[4].data&&r[4].data[0]&&r[4].data[0].nombre)||'';
+    var me=(!r[4].error&&r[4].data&&r[4].data[0])||{};ROL=me.rol==='staff'?'staff':'admin';PERM=(me.permisos&&typeof me.permisos==='object')?me.permisos:null;S.eq=undefined;S.pend=null;
     PLANES={};
     r[0].data.forEach(function(p){PLANES[p.id]=mapPlan(p);});rebuildOrd();
     alumnos=r[1].data.map(mapAl);
@@ -895,6 +943,7 @@ function cargar(){
     r[3].data.forEach(function(x){ULT[x.alumno_id]=pd(x.fecha);if(x.fecha===iso(hoy))S.pres.add(x.alumno_id);});
     S.F=null;S.AV=null;
     S.cargado=true;
+    cargarPend();
   });
 }
 
@@ -971,9 +1020,18 @@ function brandHTML(cls){
   return '<div class="wmk">'+esc(GYM.nombre)+'</div>';
 }
 function brandTag(){return esBlazar()?'TEAM CALISTENIA':'GESTIÓN DE ALUMNOS';}
+function navPermisos(){
+  var bs=document.querySelectorAll('.nav [data-v]'),n=0,i,b;
+  for(i=0;i<bs.length;i++){b=bs[i];
+    if(b.classList.contains('who')){b.disabled=!isAdmin();continue;}
+    var ok=allowed(b.getAttribute('data-v'));b.style.display=ok?'':'none';if(ok)n++;
+  }
+  var nav=document.querySelector('.nav');if(nav)nav.style.gridTemplateColumns='repeat('+n+',minmax(0,1fr))';
+}
 function fillShell(){
+  navPermisos();
   var b=document.getElementById('brand');if(b)b.innerHTML=brandHTML('lg-nav')+'<div class="tag">'+brandTag()+'</div>';
-  var wg=document.getElementById('whoGym');if(wg){wg.textContent=GYM.nombre;document.getElementById('whoUser').textContent=GYM.usuario||'Administrador';document.getElementById('whoAv').textContent=ini(GYM.usuario||GYM.nombre);}
+  var wg=document.getElementById('whoGym');if(wg){wg.textContent=GYM.nombre;document.getElementById('whoUser').textContent=GYM.usuario||(isAdmin()?'Administrador':'Equipo');document.getElementById('whoAv').textContent=ini(GYM.usuario||GYM.nombre);}
 }
 
 /* ===== Importar alumnos ===== */
@@ -1422,7 +1480,8 @@ function ajustesView(){
       '<input type="file" id="firmaFile" accept="image/*" hidden>'+
       '<div class="acts3"><button type="button" class="btn primary" data-a="firmadibujar">Firmar con el dedo</button><button type="button" class="btn" data-a="firmaelegir">Subir foto</button><button type="button" class="btn" data-a="firmaquitar"'+(GYM.firma?'':' disabled')+'>Quitar firma</button></div>'+
       '<form id="fFirma" class="stack"><label class="field">Aclaración (el nombre que va debajo de la firma)<input class="input" name="firmante" maxlength="80" placeholder="Ej: Ezequiel Gómez · Titular" value="'+esc(GYM.firmante||'')+'"></label><button type="submit" class="btn">Guardar aclaración</button></form></section>'+
-    '<section class="card stack"><h2 class="title h2">Cuenta</h2><div class="sub2">Sesión iniciada como <b style="color:var(--tx)">'+esc(GYM.usuario||'Administrador')+'</b>.</div>'+
+    equipoCard()+portalCard()+
+    '<section class="card stack"><h2 class="title h2">Cuenta</h2><div class="sub2">Sesión iniciada como <b style="color:var(--tx)">'+esc(GYM.usuario||(isAdmin()?'Administrador':'Equipo'))+'</b>.</div>'+
       '<button type="button" class="btn" data-a="salir">Cerrar sesión</button><div class="by" style="margin-top:4px">Desarrollado por Vertag Solutions.</div></section>'+
   '</div></div>';
 }
@@ -1491,6 +1550,108 @@ document.addEventListener('change',function(e){
   if(e.target.id==='logoFile'){procesarLogo(e.target.files[0]);e.target.value='';}
   else if(e.target.id==='evSel'){S.evK=e.target.value;var ss=seriesMarcas(S.F?S.F.avances:[]);var cur=ss.filter(function(x){return x.k===S.evK;})[0];if(cur)document.getElementById('evChart').innerHTML=evoSvg(cur);}
 });
+
+/* ===== Equipo, cuentas de alumnos y link del portal ===== */
+var PERMS=[['alumnos','Alumnos','Ver y editar alumnos, importar listas y aprobar cuentas del portal'],['asistencia','Asistencia','Tomar la asistencia'],['avances','Avances','Cargar marcas y logros de los alumnos'],['cobros','Cobros','Cobrar cuotas, ver pagos e ingresos'],['contenido','Contenido','Cargar noticias y eventos del portal de alumnos']];
+function baseUrl(){return location.origin+location.pathname.replace(/[^\/]*$/,'');}
+function linkAlumnos(){return GYM.slug?baseUrl()+'atleta.html?g='+encodeURIComponent(GYM.slug):'';}
+function copiarTxt(t){
+  function ok(){toast('Link copiado',true);}
+  function plan(){var x=document.createElement('textarea');x.value=t;x.setAttribute('readonly','');x.style.cssText='position:fixed;opacity:0';document.body.appendChild(x);x.select();try{document.execCommand('copy');ok();}catch(e){toast('No se pudo copiar. Copialo a mano.');}document.body.removeChild(x);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,plan);}else plan();
+}
+function permChips(p){var l=PERMS.filter(function(x){return p&&p[x[0]]===true;}).map(function(x){return '<span class="pchip">'+x[1]+'</span>';}).join('');return l||'<span class="pchip off">Solo consulta</span>';}
+function miRolCard(){
+  var l=PERMS.filter(function(x){return can(x[0]);}).map(function(x){return '<li>'+x[2]+'</li>';}).join('');
+  return '<section class="card c-rev"><div class="eyebrow">Tu acceso</div><div class="big-num rev-num" style="font-size:30px">Equipo</div><ul class="plist">'+(l||'<li>Solo podés consultar la lista de alumnos.</li>')+'</ul></section>';
+}
+function loadEquipo(){
+  if(S.eqLoading)return;S.eqLoading=true;
+  db.rpc('listar_equipo').then(function(r){S.eqLoading=false;S.eq=r.error?null:(r.data||[]);if(S.view==='ajustes')render();});
+}
+function equipoCard(){
+  var h='<section class="card stack"><h2 class="title h2">Equipo</h2><p class="sub2">Invitá a otras personas del gimnasio y elegí qué puede hacer cada una. Vos, como administrador, ves todo.</p>';
+  if(S.eq===undefined){loadEquipo();h+='<div class="loading" style="padding:8px 0">Cargando...</div>';}
+  else if(S.eq===null){h+='<p class="sub2">Para usar el equipo falta ejecutar el patch 10 en Supabase.</p>';}
+  else{
+    h+=S.eq.map(function(m,i){
+      var nom=m.nombre||m.email,adm=m.rol==='admin';
+      return '<div class="line"><div class="av">'+esc(ini(nom))+'</div><div class="grow"><b>'+esc(nom)+(adm?' · Administrador':'')+'</b><small>'+esc(m.email)+(m.pendiente?' · invitación pendiente':'')+'</small>'+(adm?'':'<div class="pchips">'+permChips(m.permisos)+'</div>')+'</div>'+
+        (adm?'':'<div class="a2"><button type="button" class="btn ghost sm" data-a="eqed" data-id="'+i+'">Permisos</button><button type="button" class="btn sm" data-a="eqdel" data-id="'+i+'">'+(m.pendiente?'Cancelar':'Quitar')+'</button></div>')+'</div>';
+    }).join('');
+  }
+  return h+'<button type="button" class="btn primary" data-a="eqnuevo">Invitar al equipo</button></section>';
+}
+function portalCard(){
+  var l=linkAlumnos();
+  return '<section class="card stack"><h2 class="title h2">Portal de alumnos</h2><p class="sub2">Compartí este link con tus alumnos. Cada uno se crea su cuenta con su mail: si coincide con el de su ficha entra solo, y si no, la aprobás vos en Alumnos &rsaquo; Cuentas.</p>'+
+    (l?'<div class="linkbox">'+esc(l)+'</div><div class="acts3"><button type="button" class="btn primary" data-a="copiarlink">Copiar link</button><a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent('Entrá al portal de '+GYM.nombre+' y creá tu cuenta: '+l)+'">Enviar por WhatsApp</a></div>':'<p class="sub2">No se pudo generar el link: falta ejecutar el patch 10 en Supabase.</p>')+
+    '<button type="button" class="btn" data-a="cuentas">Ver cuentas de alumnos'+(S.pend>0?' ('+S.pend+' pendientes)':'')+'</button></section>';
+}
+function openEq(i){
+  var f=document.getElementById('fEq');f.reset();var m=i===null?null:S.eq[i];S.eqEdit=m;
+  document.getElementById('dlgEqT').textContent=m?'Permisos de '+(m.nombre||m.email):'Invitar al equipo';
+  f.email.value=m?m.email:'';f.email.readOnly=!!m;f.nombre.value=m&&m.nombre?m.nombre:'';f.nombre.readOnly=!!(m&&m.user_id);
+  PERMS.forEach(function(p){f['p_'+p[0]].checked=!!(m&&m.permisos&&m.permisos[p[0]]===true);});
+  document.getElementById('btnEq').textContent=m?'Guardar':'Enviar invitación';
+  document.getElementById('eqHelp').hidden=!!m;
+  document.getElementById('dlgEq').showModal();
+}
+document.getElementById('fEq').addEventListener('submit',function(e){
+  e.preventDefault();if(S.busy)return;
+  var f=e.target,perm={},m=S.eqEdit,q;
+  PERMS.forEach(function(p){perm[p[0]]=f['p_'+p[0]].checked;});
+  if(m&&m.user_id)q=db.rpc('set_permisos_equipo',{p_user:m.user_id,p_permisos:perm});
+  else{
+    var em=f.email.value.trim().toLowerCase();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(em)){toast('Escribí un mail válido.');return;}
+    q=db.rpc('invitar_equipo',{p_email:em,p_nombre:f.nombre.value.trim(),p_permisos:perm});
+  }
+  S.busy=true;
+  q.then(function(r){
+    S.busy=false;if(fail(r,'No se pudo guardar'))return;
+    document.getElementById('dlgEq').close();S.eq=undefined;render();
+    toast(m?'Permisos guardados':'Invitación lista: pedile que cree su cuenta con ese mail',true);
+  });
+});
+/* Cuentas de alumnos (portal) */
+function cargarPend(){
+  if(!can('alumnos'))return;
+  db.from('atletas').select('user_id').eq('estado','pendiente').then(function(r){S.pend=r.error?0:(r.data||[]).length;if(S.view==='alumnos')render();});
+}
+function abrirCuentas(){
+  document.getElementById('cuentasBody').innerHTML='<div class="loading">Cargando...</div>';
+  document.getElementById('dlgCuentas').showModal();cargarCuentas();
+}
+function cargarCuentas(){
+  db.from('atletas').select('user_id,estado,email,nombre,alumno_id,created_at').order('created_at').then(function(r){
+    var box=document.getElementById('cuentasBody');if(!box)return;
+    if(r.error){box.innerHTML='<p class="sub2">Todavía no está habilitado: falta ejecutar el patch 10 en Supabase.</p>';return;}
+    S.cuentas=r.data||[];S.pend=S.cuentas.filter(function(x){return x.estado==='pendiente';}).length;
+    box.innerHTML=cuentasHtml();
+    if(S.view==='alumnos'||S.view==='ajustes')render();
+  });
+}
+function puntaje(c,a){
+  var t=nameKey(c.nombre||'').split(' ').concat(nrm(String(c.email||'').split('@')[0]).split(' ')).filter(function(x){return x.length>2;}),an=nameKey(a.nombre);
+  return t.filter(function(x){return an.indexOf(x)>=0;}).length;
+}
+function cuentasHtml(){
+  var vinc={};S.cuentas.forEach(function(x){if(x.alumno_id)vinc[x.alumno_id]=1;});
+  var libres=alumnos.filter(function(a){return !vinc[a.id];});
+  function opts(c){
+    var sc=libres.map(function(a){return {a:a,s:puntaje(c,a)};}).sort(function(p,q){return q.s-p.s||p.a.nombre.localeCompare(q.a.nombre,'es');});
+    return '<option value="">Elegí el alumno...</option>'+sc.map(function(o){return '<option value="'+o.a.id+'">'+(o.s>0?'★ ':'')+esc(o.a.nombre)+'</option>';}).join('');
+  }
+  var pe=S.cuentas.filter(function(x){return x.estado==='pendiente';}),ac=S.cuentas.filter(function(x){return x.estado==='activo';}),re=S.cuentas.filter(function(x){return x.estado==='rechazado';});
+  function quien(c){return esc(c.nombre||c.email||'Sin nombre');}
+  var h='<h3 class="title" style="font-size:18px">Esperando aprobación ('+pe.length+')</h3>'+
+    (pe.length?pe.map(function(c){return '<div class="cta"><div><b>'+quien(c)+'</b><small>'+esc(c.email||'')+'</small></div><select class="select" id="sel_'+c.user_id+'" aria-label="Alumno de esta cuenta">'+opts(c)+'</select><div class="acts"><button type="button" class="btn sm" data-a="atno" data-id="'+c.user_id+'">Rechazar</button><button type="button" class="btn primary sm" data-a="atok" data-id="'+c.user_id+'">Aprobar</button></div></div>';}).join(''):'<p class="sub2">No hay cuentas esperando.</p>');
+  h+='<h3 class="title" style="font-size:18px;margin-top:18px">Con cuenta ('+ac.length+')</h3>'+
+    (ac.length?ac.map(function(c){var al=byId(c.alumno_id);return '<div class="cta"><div><b>'+esc(al?al.nombre:quien(c))+'</b><small>'+esc(c.email||'')+'</small></div><div class="acts"><button type="button" class="btn sm" data-a="atquitar" data-id="'+c.user_id+'">Quitar cuenta</button></div></div>';}).join(''):'<p class="sub2">Todavía ningún alumno entró al portal.</p>');
+  if(re.length)h+='<h3 class="title" style="font-size:18px;margin-top:18px">Rechazadas ('+re.length+')</h3>'+re.map(function(c){return '<div class="cta"><div><b>'+quien(c)+'</b><small>'+esc(c.email||'')+'</small></div><div class="acts"><button type="button" class="btn sm" data-a="atquitar" data-id="'+c.user_id+'">Quitar</button></div></div>';}).join('');
+  return h;
+}
 
 /* ===== Firma ===== */
 function guardarFirma(url){
@@ -1659,6 +1820,24 @@ document.addEventListener('click',function(e){
   }
   else if(a==='salir'){db.auth.signOut().then(function(){location.reload();});}
   else if(a==='importar'){openImport();}
+  else if(a==='cuentas'){abrirCuentas();}
+  else if(a==='atok'){
+    var sel=document.getElementById('sel_'+id);
+    if(!sel||!sel.value){toast('Elegí a qué alumno corresponde.');return;}
+    db.rpc('aprobar_atleta',{p_user:id,p_alumno:sel.value}).then(function(r){if(fail(r,'No se pudo aprobar'))return;toast('Cuenta aprobada',true);cargarCuentas();});
+  }
+  else if(a==='atno'){if(confirm('¿Rechazar esta cuenta?'))db.rpc('rechazar_atleta',{p_user:id}).then(function(r){if(fail(r,'No se pudo rechazar'))return;toast('Cuenta rechazada',true);cargarCuentas();});}
+  else if(a==='atquitar'){if(confirm('¿Quitar esta cuenta? La persona puede volver a registrarse.'))db.rpc('quitar_atleta',{p_user:id}).then(function(r){if(fail(r,'No se pudo quitar'))return;toast('Cuenta quitada',true);cargarCuentas();});}
+  else if(a==='copiarlink'){copiarTxt(linkAlumnos());}
+  else if(a==='eqnuevo'){openEq(null);}
+  else if(a==='eqed'){openEq(+id);}
+  else if(a==='eqdel'){
+    var mm=S.eq&&S.eq[+id];
+    if(mm&&confirm(mm.pendiente?'¿Cancelar la invitación?':'¿Quitar a '+(mm.nombre||mm.email)+' del equipo?')){
+      db.rpc(mm.pendiente?'cancelar_invitacion':'quitar_miembro',mm.pendiente?{p_email:mm.email}:{p_user:mm.user_id}).then(function(r){
+        if(fail(r,'No se pudo completar'))return;S.eq=undefined;render();toast(mm.pendiente?'Invitación cancelada':'Miembro quitado',true);});
+    }
+  }
   else if(a==='firmadibujar'){abrirPad();}
   else if(a==='firmaborrar'){var cf=document.getElementById('fpad');if(PAD.ctx){PAD.ctx.clearRect(0,0,cf.width,cf.height);PAD.hay=false;document.getElementById('fpadHint').style.display='';}}
   else if(a==='firmaguardar'){guardarPad();}
@@ -1765,11 +1944,21 @@ function authErr(e){
   return t||'No se pudo completar. Probá de nuevo.';
 }
 function busyBtn(f,on){var b=f.querySelector('[type=submit]');if(b)b.disabled=on;}
-function entrar(){
+function entrar(reintento){
   $login.hidden=true;$shell.hidden=false;
   $v.innerHTML='<div class="loading">Cargando...</div>';
   cargar().then(function(){S.view=fromHash();render();}).catch(function(err){
-    if(err&&err.nogym){mostrarLogin('gym');return;}
+    if(err&&err.nogym){
+      if(reintento===true){mostrarLogin('gym');return;}
+      db.rpc('reclamar_invitacion').then(function(r){
+        if(!r.error&&r.data){entrar(true);return;}
+        db.from('atletas').select('user_id').limit(1).then(function(a){
+          if(!a.error&&a.data&&a.data.length){location.replace('atleta.html');return;}
+          mostrarLogin('gym');
+        });
+      });
+      return;
+    }
     console.error(err);
     db.auth.signOut();mostrarLogin('login');
     $err.textContent=err.message||'No se pudieron cargar los datos.';
