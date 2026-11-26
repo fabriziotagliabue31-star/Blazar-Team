@@ -535,13 +535,16 @@ function cargarGym(){
 }
 function entrar(){
   show('estado');estadoUI('pErr','Cargando...');$('pErr').querySelectorAll('button').forEach(function(b){b.hidden=true;});
-  db.from('atletas').select('estado,nombre,alumno_id,gym_id,alumnos(nombre),gyms(nombre)').limit(1).then(function(r){
-    $('pErr').querySelectorAll('button').forEach(function(b){b.hidden=false;});
-    if(r.error){
-      // fallback sin joins
-      return db.from('atletas').select('estado,nombre').limit(1).then(function(r2){if(r2.error){estadoUI('pErr','No se pudo cargar tu cuenta: '+r2.error.message);return;}gestionar(r2.data&&r2.data[0]);});
-    }
-    gestionar(r.data&&r.data[0]);
+  db.auth.getSession().then(function(ss){
+    var u=ss.data&&ss.data.session&&ss.data.session.user,uid=u&&u.id;
+    if(!uid){mostrarLogin('login');return;}
+    return db.from('atletas').select('estado,nombre,alumno_id,gym_id,alumnos(nombre),gyms(nombre)').eq('user_id',uid).limit(1).then(function(r){
+      $('pErr').querySelectorAll('button').forEach(function(b){b.hidden=false;});
+      if(r.error){
+        return db.from('atletas').select('estado,nombre').eq('user_id',uid).limit(1).then(function(r2){if(r2.error){estadoUI('pErr','No se pudo cargar tu cuenta: '+r2.error.message);return;}gestionar(r2.data&&r2.data[0]);});
+      }
+      gestionar(r.data&&r.data[0]);
+    });
   });
 }
 function gestionar(a){
