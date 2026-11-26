@@ -503,6 +503,15 @@ var GYM={nombre:''},P=null,VIEW='inicio',PER='semana',EVK=null,hoy=new Date();ho
 })();
 var REDIRECT=location.origin+location.pathname+(SLUG?'?g='+encodeURIComponent(SLUG):'');
 if(/type=recovery/.test(location.hash))RECOVERY=true;
+var HASHERR='';
+(function(){
+  var h=location.hash||'';
+  if(/error_description=|error=access_denied/.test(h)){
+    var c=(h.match(/error_code=([^&]+)/)||[])[1]||'';
+    HASHERR=c==='otp_expired'?'El enlace del mail venció o ya se usó. Si ya confirmaste tu mail, entrá con tu contraseña. Si no, tocá "Crear mi cuenta" con el mismo mail para recibir un enlace nuevo.':'No se pudo validar el enlace del mail. Probá entrar o pedí uno nuevo.';
+    try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  }
+})();
 function toast(m,ok){var t=$('toast');t.textContent=m;t.classList.toggle('ok',!!ok);t.classList.add('on');clearTimeout(tT);tT=setTimeout(function(){t.classList.remove('on');},4000);}
 function setTema(t){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('tema',t);}catch(e){}var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#F3F4F6':'#0A0A0A');}
 function busyBtn(f,b){var x=f.querySelector('button[type=submit]');if(x)x.disabled=b;}
@@ -1010,7 +1019,7 @@ cargarGym().then(function(){
   return db.auth.getSession();
 }).then(function(r){
   if(RECOVERY){mostrarLogin('reset');return;}
-  if(r.data&&r.data.session)entrar();else mostrarLogin(SLUG?'login':'login');
+  if(r.data&&r.data.session)entrar();else{mostrarLogin('login');if(HASHERR)$err.textContent=HASHERR;}
 });
 </script>
 </body>
